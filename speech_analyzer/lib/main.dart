@@ -25,48 +25,70 @@ class MyApp extends StatelessWidget {
 }
 
 class MyAppState extends ChangeNotifier {
-  final myController = TextEditingController();
+  final myController = TextEditingController();  
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  var selectedIndex = 0;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Row(
-        children: [
-          SafeArea(
-            child: NavigationRail(
-              extended: false,
-              destinations: [
-                NavigationRailDestination(
-                  icon: Icon(Icons.home),
-                  label: Text('Home'),
+    Widget page;
+    switch (selectedIndex) {
+      case 0:
+        page = InputPage();
+      case 1:
+        page = AnalysisPage();
+      default:
+        throw UnimplementedError('no widget for $selectedIndex');
+    }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Scaffold(
+          body: Row(
+            children: [
+              SafeArea(
+                child: NavigationRail(
+                  extended: false,
+                  destinations: [
+                    NavigationRailDestination(
+                      icon: Icon(Icons.home),
+                      label: Text('Home'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.favorite),
+                      label: Text('Favorites'),
+                    ),
+                  ],
+                  selectedIndex: selectedIndex,
+                  onDestinationSelected: (value) {
+                    setState(() {
+                      selectedIndex = value;
+                    });
+                  },
                 ),
-                NavigationRailDestination(
-                  icon: Icon(Icons.favorite),
-                  label: Text('Favorites'),
+              ),
+              Expanded(
+                child: Container(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  child: page,
                 ),
-              ],
-              selectedIndex: 0,
-              onDestinationSelected: (value) {
-                print('selected: $value');
-              },
-            ),
+              ),
+            ],
           ),
-          Expanded(
-            child: Container(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              child: GeneratorPage(),
-            ),
-          ),
-        ],
-      ),
+        );
+      }
     );
   }
 }
 
 
-class GeneratorPage extends StatelessWidget {
+class InputPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
@@ -136,3 +158,59 @@ class GeneratorPage extends StatelessWidget {
     );
   }
 }
+
+class AnalysisPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var myController = appState.myController;
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SizedBox(height: 40),
+          Text(
+            "Analysis",
+            style: TextStyle(
+              fontSize: 30,
+            )
+          ),
+          SizedBox(height: 30),
+          SizedBox(height: 30),
+          SizedBox(
+            height:200,
+            width:500,
+            child: TextField(
+              maxLines: 10,
+              controller: myController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Enter your speech here',
+              ),
+            ),
+          ),
+          SizedBox(height: 10),
+          ElevatedButton(
+            // When the user presses the button, show an alert dialog containing
+            // the text that the user has entered into the text field.
+            onPressed: () {
+              showDialog<void>(
+                context: context,
+                builder: (context) {
+                return AlertDialog(
+                  // Retrieve the text the that user has entered by using the
+                  // TextEditingController.
+                  content: Text(myController.text),
+                  );
+                },
+              );
+            },
+            child: Text("Submit"),
+          ),
+        ],
+      ),
+    );
+  }
+}
+

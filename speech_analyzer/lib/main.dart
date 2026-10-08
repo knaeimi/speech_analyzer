@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -26,6 +28,7 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
   final myController = TextEditingController();  
+  final textMap = SplayTreeMap<String,int>();
 }
 
 class MyHomePage extends StatefulWidget {
@@ -93,6 +96,8 @@ class InputPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var myController = appState.myController;
+    var wordList = [];
+    var textMap = appState.textMap;
 
     return Center(
       child: Column(
@@ -111,6 +116,7 @@ class InputPage extends StatelessWidget {
             children: [
               ElevatedButton.icon(
                 onPressed: () {
+                  textMap.clear();
                 },
                 label: Text('Text'),
               ),
@@ -140,13 +146,20 @@ class InputPage extends StatelessWidget {
             // When the user presses the button, show an alert dialog containing
             // the text that the user has entered into the text field.
             onPressed: () {
+              textMap.clear();
+              wordList = myController.text.toLowerCase().split(' ');
+              print(wordList);
+              for (String word in wordList){
+                textMap.update(word, (value) => ++value, ifAbsent: () => 1);
+              }
+              textMap.remove(' ');
               showDialog<void>(
                 context: context,
                 builder: (context) {
                 return AlertDialog(
                   // Retrieve the text the that user has entered by using the
                   // TextEditingController.
-                  content: Text(myController.text),
+                  content: Text(textMap.toString()),
                   );
                 },
               );
@@ -175,38 +188,6 @@ class AnalysisPage extends StatelessWidget {
             style: TextStyle(
               fontSize: 30,
             )
-          ),
-          SizedBox(height: 30),
-          SizedBox(height: 30),
-          SizedBox(
-            height:200,
-            width:500,
-            child: TextField(
-              maxLines: 10,
-              controller: myController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Enter your speech here',
-              ),
-            ),
-          ),
-          SizedBox(height: 10),
-          ElevatedButton(
-            // When the user presses the button, show an alert dialog containing
-            // the text that the user has entered into the text field.
-            onPressed: () {
-              showDialog<void>(
-                context: context,
-                builder: (context) {
-                return AlertDialog(
-                  // Retrieve the text the that user has entered by using the
-                  // TextEditingController.
-                  content: Text(myController.text),
-                  );
-                },
-              );
-            },
-            child: Text("Submit"),
           ),
         ],
       ),

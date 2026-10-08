@@ -176,7 +176,7 @@ class AnalysisPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-    var myController = appState.myController;
+    var textMap = appState.textMap;
 
     return Center(
       child: Column(
@@ -189,6 +189,7 @@ class AnalysisPage extends StatelessWidget {
               fontSize: 30,
             )
           ),
+          Text(textMap.toString()),
         ],
       ),
     );

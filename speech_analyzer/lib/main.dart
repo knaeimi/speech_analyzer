@@ -1,6 +1,4 @@
 import 'dart:collection';
-
-import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -153,27 +151,14 @@ class InputPage extends StatelessWidget {
               ),
               SizedBox(width: 20),
               ElevatedButton(
-                // When the user presses the button, show an alert dialog containing
-                // the text that the user has entered into the text field.
                 onPressed: () {
                   textMap.clear();
                   wordList = myController.text.toLowerCase().split(' ');
-                  print(wordList);
                   for (String word in wordList){
                     textMap.update(word, (value) => ++value, ifAbsent: () => 1);
                   }
                   textMap.remove(' ');
                   textMap = HashMap.fromEntries(textMap.entries.toList()..sort((e2,e1)=>e1.value.compareTo(e2.value)));
-                  showDialog<void>(
-                    context: context,
-                    builder: (context) {
-                    return AlertDialog(
-                      // Retrieve the text the that user has entered by using the
-                      // TextEditingController.
-                      content: Text(textMap.toString()),
-                      );
-                    },
-                  );
                 },
                 child: Text("Submit"),
               ),

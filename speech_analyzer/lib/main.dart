@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
   final myController = TextEditingController();  
-  final textMap = SplayTreeMap<String,int>();
+  final textMap = HashMap<String,int>();
 }
 
 class MyHomePage extends StatefulWidget {
@@ -120,7 +120,7 @@ class InputPage extends StatelessWidget {
                 },
                 label: Text('Text'),
               ),
-              SizedBox(width: 10),
+              SizedBox(width: 20),
               ElevatedButton(
                 onPressed: () {
                 },
@@ -142,29 +142,42 @@ class InputPage extends StatelessWidget {
             ),
           ),
           SizedBox(height: 10),
-          ElevatedButton(
-            // When the user presses the button, show an alert dialog containing
-            // the text that the user has entered into the text field.
-            onPressed: () {
-              textMap.clear();
-              wordList = myController.text.toLowerCase().split(' ');
-              print(wordList);
-              for (String word in wordList){
-                textMap.update(word, (value) => ++value, ifAbsent: () => 1);
-              }
-              textMap.remove(' ');
-              showDialog<void>(
-                context: context,
-                builder: (context) {
-                return AlertDialog(
-                  // Retrieve the text the that user has entered by using the
-                  // TextEditingController.
-                  content: Text(textMap.toString()),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  myController.clear();
+                }, 
+                child: Text("Clear")
+              ),
+              SizedBox(width: 20),
+              ElevatedButton(
+                // When the user presses the button, show an alert dialog containing
+                // the text that the user has entered into the text field.
+                onPressed: () {
+                  textMap.clear();
+                  wordList = myController.text.toLowerCase().split(' ');
+                  print(wordList);
+                  for (String word in wordList){
+                    textMap.update(word, (value) => ++value, ifAbsent: () => 1);
+                  }
+                  textMap.remove(' ');
+                  textMap = HashMap.fromEntries(textMap.entries.toList()..sort((e2,e1)=>e1.value.compareTo(e2.value)));
+                  showDialog<void>(
+                    context: context,
+                    builder: (context) {
+                    return AlertDialog(
+                      // Retrieve the text the that user has entered by using the
+                      // TextEditingController.
+                      content: Text(textMap.toString()),
+                      );
+                    },
                   );
                 },
-              );
-            },
-            child: Text("Submit"),
+                child: Text("Submit"),
+              ),
+            ],
           ),
         ],
       ),
@@ -189,7 +202,43 @@ class AnalysisPage extends StatelessWidget {
               fontSize: 30,
             )
           ),
-          Text(textMap.toString()),
+          SizedBox(height:40),
+          // Source - https://stackoverflow.com/a/67434006
+          // Posted by LihnNguyen
+          // Retrieved 2026-10-09, License - CC BY-SA 4.0
+          DataTable(
+            columnSpacing: 50,
+            columns: const <DataColumn>[
+              DataColumn(
+                label: Text(
+                  'Word',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  'Times used',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                headingRowAlignment: MainAxisAlignment.center
+              ),
+            
+            ],
+            rows: textMap.entries.map(
+              (e) {
+                return DataRow(
+                  cells: [
+                    DataCell(
+                      Text(e.key)
+                    ),
+                    DataCell(
+                      Text(e.value.toString())
+                    )
+                  ]
+                  );
+              },
+              ).toList()
+          ),
         ],
       ),
     );

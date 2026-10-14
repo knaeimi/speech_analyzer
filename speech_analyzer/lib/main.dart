@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
 class MyAppState extends ChangeNotifier {
   final myController = TextEditingController();  
   final textMap = HashMap<String,int>();
+  final textList = [];
 }
 
 class MyHomePage extends StatefulWidget {
@@ -100,6 +101,7 @@ class InputPage extends StatelessWidget {
     var myController = appState.myController;
     var wordList = [];
     var textMap = appState.textMap;
+    var textList = appState.textList;
 
     return Center(
       child: Column(
@@ -132,7 +134,7 @@ class InputPage extends StatelessWidget {
           ),
           SizedBox(height: 30),
           SizedBox(
-            height:500,
+            height:200,
             width:500,
             child: TextField(
               maxLines: 10,
@@ -157,12 +159,15 @@ class InputPage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   textMap.clear();
-                  wordList = myController.text.toLowerCase().split(' ');
+                  wordList = myController.text.toLowerCase().replaceAll(RegExp(r"[,.;@#?!&$'-/()]"), ' ').replaceAll("  ", " ").replaceAll("\n", " ").split(' ');
                   for (String word in wordList){
                     textMap.update(word, (value) => ++value, ifAbsent: () => 1);
                   }
                   textMap.remove(' ');
                   textMap = HashMap.fromEntries(textMap.entries.toList()..sort((e2,e1)=>e1.value.compareTo(e2.value)));
+                  textList = textMap.entries.toList().sublist(0,10);
+                  print(textMap.entries);
+                  print(textList);
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => AnalysisPage()) // Switches but analysis page is
@@ -186,6 +191,7 @@ class AnalysisPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var textMap = appState.textMap;
+    var textList = appState.textList;
 
     return Center(
       child: Column(
@@ -220,9 +226,9 @@ class AnalysisPage extends StatelessWidget {
               ),
             
             ],
-            rows: textMap.entries.map(
-              (e) {
-                return DataRow(
+            rows: textList.map(
+              (e) =>
+                DataRow(
                   cells: [
                     DataCell(
                       Text(e.key)
@@ -231,8 +237,7 @@ class AnalysisPage extends StatelessWidget {
                       Text(e.value.toString())
                     )
                   ]
-                  );
-              },
+                  )
               ).toList()
           ),
         ],

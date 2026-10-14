@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Speech Analyzer',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 139, 68, 163)),
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 68, 163, 109)),
         ),
         home: MyHomePage(),
       ),
@@ -88,8 +88,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-
+/**
+ * Input page class
+ */
 class InputPage extends StatelessWidget {
+  const InputPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
@@ -128,14 +132,14 @@ class InputPage extends StatelessWidget {
           ),
           SizedBox(height: 30),
           SizedBox(
-            height:200,
+            height:500,
             width:500,
             child: TextField(
               maxLines: 10,
               controller: myController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: 'Enter your speech here',
+                hintText: 'Enter your speech here...',
               ),
             ),
           ),
@@ -159,6 +163,10 @@ class InputPage extends StatelessWidget {
                   }
                   textMap.remove(' ');
                   textMap = HashMap.fromEntries(textMap.entries.toList()..sort((e2,e1)=>e1.value.compareTo(e2.value)));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AnalysisPage()) // Switches but analysis page is
+                    );
                 },
                 child: Text("Submit"),
               ),
@@ -170,6 +178,9 @@ class InputPage extends StatelessWidget {
   }
 }
 
+/**
+ * Analysis page class
+ */
 class AnalysisPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:collection/collection.dart';
 
 void main() {
   runApp(MyApp());
@@ -26,8 +27,9 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
   final myController = TextEditingController();  
-  final textMap = HashMap<String,int>();
-  final textList = [];
+  final HashMap<String,int> textMap = HashMap<String,int>();
+  final List<MapEntry<String,int>> textList = [];
+  final List<DataRow> dataList = [];
 }
 
 class MyHomePage extends StatefulWidget {
@@ -71,12 +73,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   onDestinationSelected: (int value) {
                     setState(() {
                       selectedIndex = value;
-                      if (value == 1) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AnalysisPage()));
-                      }
                     });
                   },
                 ),
@@ -106,8 +102,9 @@ class InputPage extends StatelessWidget {
     var appState = context.watch<MyAppState>();
     var myController = appState.myController;
     var wordList = [];
-    var textMap = appState.textMap;
-    var textList = appState.textList;
+    HashMap<String,int> textMap = appState.textMap;
+    List<MapEntry<String,int>> textList = appState.textList;
+    List<DataRow> dataList = appState.dataList;
 
     return Center(
       child: Column(
@@ -165,15 +162,26 @@ class InputPage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   textMap.clear();
+                  dataList.clear();
                   wordList = myController.text.toLowerCase().replaceAll(RegExp(r"[,.;@#?!&$'-/()]"), ' ').replaceAll("  ", " ").replaceAll("\n", " ").split(' ');
                   for (String word in wordList){
                     textMap.update(word, (value) => ++value, ifAbsent: () => 1);
                   }
                   textMap.remove(' ');
                   textMap = HashMap.fromEntries(textMap.entries.toList()..sort((e2,e1)=>e1.value.compareTo(e2.value)));
-                  textList = textMap.entries.toList().sublist(0,10);
-                  print(textMap.entries);
-                  print(textList);
+                  textList = textMap.entries.toList().sublist(0,[10,textMap.entries.toList().length].min);
+                  for (MapEntry<String,int> set in textList){
+                    dataList.add(DataRow(
+                      cells: [
+                        DataCell(
+                          Text(set.key)
+                        ),
+                        DataCell(
+                          Text(set.value.toString())
+                        )
+                      ]
+                      ));
+                  }
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => AnalysisPage()) // Switches but analysis page is
@@ -196,8 +204,7 @@ class AnalysisPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-    var textMap = appState.textMap;
-    var textList = appState.textList;
+    List<DataRow> dataList = appState.dataList;
 
     return Center(
       child: Column(
@@ -232,19 +239,7 @@ class AnalysisPage extends StatelessWidget {
               ),
             
             ],
-            rows: textList.map(
-              (e) =>
-                DataRow(
-                  cells: [
-                    DataCell(
-                      Text(e.key)
-                    ),
-                    DataCell(
-                      Text(e.value.toString())
-                    )
-                  ]
-                  )
-              ).toList()
+            rows: dataList
           ),
         ],
       ),

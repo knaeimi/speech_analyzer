@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 68, 163, 109)),
         ),
-        home: MyHomePage(),
+        home: InputPage(),
       ),
     );
   }
@@ -30,65 +30,6 @@ class MyAppState extends ChangeNotifier {
   final HashMap<String,int> textMap = HashMap<String,int>();
   final List<MapEntry<String,int>> textList = [];
   final List<DataRow> dataList = [];
-}
-
-class MyHomePage extends StatefulWidget {
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  var selectedIndex = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    Widget page;
-    switch (selectedIndex) {
-      case 0:
-        page = InputPage();
-      case 1:
-        page = AnalysisPage();
-      default:
-        throw UnimplementedError('no widget for $selectedIndex');
-    }
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Scaffold(
-          body: Row(
-            children: [
-              SafeArea(
-                child: NavigationRail(
-                  extended: false,
-                  destinations: [
-                    NavigationRailDestination(
-                      icon: Icon(Icons.home),
-                      label: Text('Home'),
-                    ),
-                    NavigationRailDestination(
-                      icon: Icon(Icons.favorite),
-                      label: Text('Favorites'),
-                    ),
-                  ],
-                  selectedIndex: selectedIndex,
-                  onDestinationSelected: (int value) {
-                    setState(() {
-                      selectedIndex = value;
-                    });
-                  },
-                ),
-              ),
-              Expanded(
-                child: Container(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  child: page,
-                ),
-              ),
-            ],
-          ),
-        );
-      }
-    );
-  }
 }
 
 /**
@@ -107,7 +48,8 @@ class InputPage extends StatelessWidget {
     List<DataRow> dataList = appState.dataList;
 
     return Center(
-      child: Column(
+      child: Scaffold(
+        body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(height: 40),
@@ -163,7 +105,7 @@ class InputPage extends StatelessWidget {
                 onPressed: () {
                   textMap.clear();
                   dataList.clear();
-                  wordList = myController.text.toLowerCase().replaceAll(RegExp(r"[,.;@#?!&$'-/()]"), ' ').replaceAll("  ", " ").replaceAll("\n", " ").split(' ');
+                  wordList = myController.text.toLowerCase().replaceAll(RegExp(r"[,.;@#?!&$'-/()]"), ' ').replaceAll("  ", " ").replaceAll("\n", " ").replaceAll("/t"," ").split(' ');
                   for (String word in wordList){
                     textMap.update(word, (value) => ++value, ifAbsent: () => 1);
                   }
@@ -193,6 +135,7 @@ class InputPage extends StatelessWidget {
           ),
         ],
       ),
+      )
     );
   }
 }
@@ -201,13 +144,15 @@ class InputPage extends StatelessWidget {
  * Analysis page class
  */
 class AnalysisPage extends StatelessWidget {
+  const AnalysisPage({super.key});
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     List<DataRow> dataList = appState.dataList;
 
-    return Center(
-      child: Column(
+    return Scaffold(
+      body: Center( 
+        child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(height: 40),
@@ -241,8 +186,19 @@ class AnalysisPage extends StatelessWidget {
             ],
             rows: dataList
           ),
+          SizedBox(height: 30),
+          ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(
+                    context,
+                    MaterialPageRoute(builder: (context) => InputPage()) // Switches but analysis page is
+                    );
+                },
+                child: Text("Back"),
+              ),
         ],
       ),
+      )
     );
   }
 }

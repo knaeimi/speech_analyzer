@@ -68,9 +68,15 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ],
                   selectedIndex: selectedIndex,
-                  onDestinationSelected: (value) {
+                  onDestinationSelected: (int value) {
                     setState(() {
                       selectedIndex = value;
+                      if (value == 1) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AnalysisPage()));
+                      }
                     });
                   },
                 ),

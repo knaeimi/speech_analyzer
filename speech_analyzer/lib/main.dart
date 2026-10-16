@@ -105,7 +105,7 @@ class InputPage extends StatelessWidget {
                 onPressed: () {
                   textMap.clear();
                   dataList.clear();
-                  wordList = myController.text.toLowerCase().replaceAll(RegExp(r"[,.;@#?!&$'-/()]"), ' ').replaceAll("  ", " ").replaceAll("\n", " ").replaceAll("/t"," ").split(' ');
+                  wordList = myController.text.toLowerCase().replaceAll(RegExp(r"[,.;@#?!&$'-/()]"), ' ').replaceAll("\n", " ").replaceAll("/t"," ").replaceAll("  ", " ").split(' ');
                   for (String word in wordList){
                     textMap.update(word, (value) => ++value, ifAbsent: () => 1);
                   }

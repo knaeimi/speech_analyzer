@@ -17,7 +17,8 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Speech Analyzer',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 68, 163, 109)),
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(0, 195, 157, 246)
+          , surface: Color.fromARGB(230, 0, 11, 69)),
         ),
         home: InputPage(),
       ),
@@ -57,6 +58,7 @@ class InputPage extends StatelessWidget {
             "Speech Analyzer",
             style: TextStyle(
               fontSize: 30,
+              color: Colors.white
             )
           ),
           SizedBox(height: 30),
@@ -82,11 +84,13 @@ class InputPage extends StatelessWidget {
             height:200,
             width:500,
             child: TextField(
+              style: TextStyle(color: Colors.white),
               maxLines: 10,
               controller: myController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 hintText: 'Enter your speech here...',
+                hintStyle: TextStyle(color: Colors.white)
               ),
             ),
           ),
@@ -104,12 +108,11 @@ class InputPage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   textMap.clear();
-                  dataList.clear();
-                  wordList = myController.text.toLowerCase().replaceAll(RegExp(r"[,.;@#?!&$'-/()]"), ' ').replaceAll("\n", " ").replaceAll("/t"," ").replaceAll("  ", " ").split(' ');
+                  dataList.clear(); // trim() for leading & trailing spaces that were being counted
+                  wordList = myController.text.trim().toLowerCase().replaceAll(RegExp(r"[,.;@#?!&$'-/()]"), ' ').replaceAll("\n", " ").replaceAll("/t"," ").replaceAll("  ", " ").split(' ');
                   for (String word in wordList){
                     textMap.update(word, (value) => ++value, ifAbsent: () => 1);
                   }
-                  textMap.remove(' ');
                   textMap = HashMap.fromEntries(textMap.entries.toList()..sort((e2,e1)=>e1.value.compareTo(e2.value)));
                   textList = textMap.entries.toList().sublist(0,[10,textMap.entries.toList().length].min);
                   for (MapEntry<String,int> set in textList){
@@ -126,7 +129,7 @@ class InputPage extends StatelessWidget {
                   }
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => AnalysisPage()) // Switches but analysis page is
+                    MaterialPageRoute(builder: (context) => AnalysisPage())
                     );
                 },
                 child: Text("Submit"),
@@ -160,6 +163,7 @@ class AnalysisPage extends StatelessWidget {
             "Analysis",
             style: TextStyle(
               fontSize: 30,
+              color: Colors.white
             )
           ),
           SizedBox(height:40),
@@ -167,18 +171,19 @@ class AnalysisPage extends StatelessWidget {
           // Posted by LihnNguyen
           // Retrieved 2026-10-09, License - CC BY-SA 4.0
           DataTable(
+            dataTextStyle: TextStyle(color: Colors.white),
             columnSpacing: 50,
             columns: const <DataColumn>[
               DataColumn(
                 label: Text(
                   'Word',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                 ),
               ),
               DataColumn(
                 label: Text(
                   'Times used',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 headingRowAlignment: MainAxisAlignment.center
               ),

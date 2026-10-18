@@ -205,7 +205,7 @@ class SpeechInputPage extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ElevatedButton.icon(
+              TextButton.icon(
                 onPressed: () {
                   textMap.clear();
                   Navigator.pop(
@@ -217,7 +217,7 @@ class SpeechInputPage extends StatelessWidget {
                 label: Text('Text'),
               ),
               SizedBox(width: 20),
-              ElevatedButton(
+              TextButton(
                 onPressed: () {
                 },
                 child: Text('Speech'),

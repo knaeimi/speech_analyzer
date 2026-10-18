@@ -42,8 +42,8 @@ class MyAppState extends ChangeNotifier {
     textMap.clear();
     initialWords = words;
     wordList = words.replaceAll(RegExp(r"[,.;@#?!&$'-/()]"), '').replaceAll("\n", " ").replaceAll("/t"," ").replaceAll("  ", " ").split(' ');
-    for (String word in wordList){
-      textMap.update(word, (value) => ++value, ifAbsent: () => 1);
+    for (String word in wordList){ // Empty input was counted as word, this check fixes that and also don't need trim anymore
+      if (word.isNotEmpty) textMap.update(word, (value) => ++value, ifAbsent: () => 1);
     }
     textMap = HashMap.fromEntries(textMap.entries.toList()..sort((e2,e1)=>e1.value.compareTo(e2.value)));
     textList = textMap.entries.toList().sublist(0,[10,textMap.entries.toList().length].min);
@@ -205,19 +205,19 @@ class SpeechInputPage extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextButton.icon(
+              ElevatedButton.icon(
                 onPressed: () {
                   textMap.clear();
                   Navigator.pop(
                     context,
                     MaterialPageRoute(builder: (context) => AnalysisPage())
                     );
-
                 },
                 label: Text('Text'),
+                
               ),
               SizedBox(width: 20),
-              TextButton(
+              ElevatedButton(
                 onPressed: () {
                 },
                 child: Text('Speech'),
@@ -248,6 +248,7 @@ class SpeechInputPage extends StatelessWidget {
                   myController.clear();
                 }, 
                 child: Text("Clear")
+                
               ),
               SizedBox(width: 20),
               ElevatedButton(
@@ -262,6 +263,7 @@ class SpeechInputPage extends StatelessWidget {
             ],
           ),
               // Button placement temporary
+              SizedBox(height: 40),
               ElevatedButton(
                 onPressed: () async {
                   // await _plugin.start(localeId: 'en-US');
@@ -271,12 +273,14 @@ class SpeechInputPage extends StatelessWidget {
                   semanticLabel: "Mic button: press and begin speech",
                 )
               ),
+              SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
                   // await _plugin.stop();
                 }, 
                 child: Text("Pause")
               ),
+              SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {}, 
                 child: Text("Continue")
@@ -366,8 +370,8 @@ class TextInputPage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   textMap.clear();
-                  dataList.clear(); // trim() for leading & trailing spaces that were being counted
-                  words = myController.text.trim().toLowerCase();
+                  dataList.clear(); 
+                  words = myController.text.toLowerCase();
                   appState.baseAnalysis(words);
                   Navigator.push(
                     context,

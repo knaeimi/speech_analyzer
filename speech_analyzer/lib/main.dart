@@ -30,10 +30,76 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
   final myController = TextEditingController();  
-  final HashMap<String,int> textMap = HashMap<String,int>();
-  final List<MapEntry<String,int>> textList = [];
-  final List<DataRow> dataList = [];
+  HashMap<String,int> textMap = HashMap<String,int>();
+  List<MapEntry<String,int>> textList = [];
+  List<DataRow> dataList = [];
+  List<String> wordList = [];
+  List<String> sentenceList = [];
+  String initialWords = '';
 
+  void baseAnalysis(String words){
+    wordList.clear();
+    textMap.clear();
+    initialWords = words;
+    wordList = words.replaceAll(RegExp(r"[,.;@#?!&$'-/()]"), '').replaceAll("\n", " ").replaceAll("/t"," ").replaceAll("  ", " ").split(' ');
+    for (String word in wordList){
+      textMap.update(word, (value) => ++value, ifAbsent: () => 1);
+    }
+    textMap = HashMap.fromEntries(textMap.entries.toList()..sort((e2,e1)=>e1.value.compareTo(e2.value)));
+    textList = textMap.entries.toList().sublist(0,[10,textMap.entries.toList().length].min);
+    for (MapEntry<String,int> set in textList){
+      dataList.add(DataRow(
+        cells: [
+          DataCell(
+            Text(set.key)
+          ),
+          DataCell(
+            Text(set.value.toString())
+          )
+        ]
+      ));
+    }
+  }
+
+  void removePrepositions(){
+    List<String> prepositions = ['the','a','an','is','am','are','be','do','to','it','and','of','that','at','was','had'];
+
+    textMap.clear();
+    for (String word in wordList){
+      if (!prepositions.contains(word)){
+        textMap.update(word, (value) => ++value, ifAbsent: () => 1);
+      }
+    }
+    textMap = HashMap.fromEntries(textMap.entries.toList()..sort((e2,e1)=>e1.value.compareTo(e2.value)));
+    textList = textMap.entries.toList().sublist(0,[10,textMap.entries.toList().length].min);
+    for (MapEntry<String,int> set in textList){
+      dataList.add(DataRow(
+        cells: [
+          DataCell(
+            Text(set.key)
+          ),
+          DataCell(
+            Text(set.value.toString())
+          )
+        ]
+      ));
+    }
+  }
+
+  double avgSentenceLength(){
+    List<String> word = [];
+    List<int> lengths = [];
+    sentenceList = initialWords.replaceAll(RegExp(r"[?!]"), '.').replaceAll("\n", "").replaceAll("/t","").replaceAll("  ", " ").split('.');
+    sentenceList = sentenceList.sublist(0,sentenceList.length-1);
+    for (String sentence in sentenceList){
+      word = sentence.trim().split(' ');
+      if(word.isNotEmpty){
+        lengths.add(word.length);
+      }
+    }
+    double average = lengths.reduce((a,b) => a + b) / lengths.length;  
+    return average;  
+  }
 }
 
 // Class Created for the initialization of speech library
@@ -232,10 +298,9 @@ class TextInputPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var myController = appState.myController;
-    var wordList = [];
     HashMap<String,int> textMap = appState.textMap;
-    List<MapEntry<String,int>> textList = appState.textList;
     List<DataRow> dataList = appState.dataList;
+    String words = '';
 
     return Center(
       child: Scaffold(
@@ -302,24 +367,8 @@ class TextInputPage extends StatelessWidget {
                 onPressed: () {
                   textMap.clear();
                   dataList.clear(); // trim() for leading & trailing spaces that were being counted
-                  wordList = myController.text.trim().toLowerCase().replaceAll(RegExp(r"[,.;@#?!&$'-/()]"), ' ').replaceAll("\n", " ").replaceAll("/t"," ").replaceAll("  ", " ").split(' ');
-                  for (String word in wordList){
-                    textMap.update(word, (value) => ++value, ifAbsent: () => 1);
-                  }
-                  textMap = HashMap.fromEntries(textMap.entries.toList()..sort((e2,e1)=>e1.value.compareTo(e2.value)));
-                  textList = textMap.entries.toList().sublist(0,[10,textMap.entries.toList().length].min);
-                  for (MapEntry<String,int> set in textList){
-                    dataList.add(DataRow(
-                      cells: [
-                        DataCell(
-                          Text(set.key)
-                        ),
-                        DataCell(
-                          Text(set.value.toString())
-                        )
-                      ]
-                      ));
-                  }
+                  words = myController.text.trim().toLowerCase();
+                  appState.baseAnalysis(words);
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => AnalysisPage())
@@ -359,7 +408,48 @@ class AnalysisPage extends StatelessWidget {
               color: Colors.white
             )
           ),
-          SizedBox(height:40),
+          SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  dataList.clear();
+                  appState.removePrepositions();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                    builder: (BuildContext context) => AnalysisPage()));
+                },
+                child: Text("Remove Prepositions"),
+              ),SizedBox(width: 20),
+              ElevatedButton(
+                onPressed: () {
+                  double average = appState.avgSentenceLength();
+                  showDialog<void>(
+                    context: context,
+                    builder: (context) {
+                    return AlertDialog(
+                      content: Text("Your average sentence length is ${average.toStringAsFixed(2)} words per sentence."),
+                      );
+                    },
+                  );
+                },
+                child: Text("Average Sentence Length"),
+              ),
+              SizedBox(width: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(
+                    context,
+                    MaterialPageRoute(builder: (context) => TextInputPage()) // Switches but analysis page is
+                    );
+                },
+                child: Text("Back"),
+              ),
+            ],
+          ),
+          SizedBox(height:20),
           // Source - https://stackoverflow.com/a/67434006
           // Posted by LihnNguyen
           // Retrieved 2026-10-09, License - CC BY-SA 4.0
@@ -384,20 +474,11 @@ class AnalysisPage extends StatelessWidget {
             ],
             rows: dataList
           ),
-          SizedBox(height: 30),
-          ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(
-                    context,
-                    MaterialPageRoute(builder: (context) => TextInputPage()) // Switches but analysis page is
-                    );
-                },
-                child: Text("Back"),
-              ),
         ],
       ),
       )
     );
   }
+
 }
 

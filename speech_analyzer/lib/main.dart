@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(0, 195, 157, 246)
           , surface: Color.fromARGB(230, 0, 11, 69)),
         ),
-        home: InputPage(),
+        home: TextInputPage(),
       ),
     );
   }
@@ -34,10 +34,125 @@ class MyAppState extends ChangeNotifier {
 }
 
 /**
- * Input page class
+ * Speech Input page class
  */
-class InputPage extends StatelessWidget {
-  const InputPage({super.key});
+class SpeechInputPage extends StatelessWidget {
+  const SpeechInputPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var myController = appState.myController;
+    var wordList = [];
+    HashMap<String,int> textMap = appState.textMap;
+    List<MapEntry<String,int>> textList = appState.textList;
+    List<DataRow> dataList = appState.dataList;
+
+    return Center(
+      child: Scaffold(
+        body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SizedBox(height: 40),
+          Text(
+            "Speech Analyzer",
+            style: TextStyle(
+              fontSize: 30,
+              color: Colors.white
+            )
+          ),
+          SizedBox(height: 30),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {
+                  textMap.clear();
+                  Navigator.pop(
+                    context,
+                    MaterialPageRoute(builder: (context) => AnalysisPage())
+                    );
+
+                },
+                label: Text('Text'),
+              ),
+              SizedBox(width: 20),
+              ElevatedButton(
+                onPressed: () {
+                },
+                child: Text('Speech'),
+              ),
+            ],
+          ),
+          SizedBox(height: 30),
+          SizedBox(
+            height:200,
+            width:500,
+            child: TextField(
+              style: TextStyle(color: Colors.white),
+              maxLines: 10,
+              controller: myController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Speak...',
+                hintStyle: TextStyle(color: Colors.white)
+              ),
+            ),
+          ),
+          SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  myController.clear();
+                }, 
+                child: Text("Clear")
+              ),
+              SizedBox(width: 20),
+              ElevatedButton(
+                onPressed: () {
+                  textMap.clear();
+                  dataList.clear(); // trim() for leading & trailing spaces that were being counted
+                  wordList = myController.text.trim().toLowerCase().replaceAll(RegExp(r"[,.;@#?!&$'-/()]"), ' ').replaceAll("\n", " ").replaceAll("/t"," ").replaceAll("  ", " ").split(' ');
+                  for (String word in wordList){
+                    textMap.update(word, (value) => ++value, ifAbsent: () => 1);
+                  }
+                  textMap = HashMap.fromEntries(textMap.entries.toList()..sort((e2,e1)=>e1.value.compareTo(e2.value)));
+                  textList = textMap.entries.toList().sublist(0,[10,textMap.entries.toList().length].min);
+                  for (MapEntry<String,int> set in textList){
+                    dataList.add(DataRow(
+                      cells: [
+                        DataCell(
+                          Text(set.key)
+                        ),
+                        DataCell(
+                          Text(set.value.toString())
+                        )
+                      ]
+                      ));
+                  }
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AnalysisPage())
+                    );
+                },
+                child: Text("Submit"),
+              ),
+            ],
+          ),
+        ],
+      ),
+      )
+    );
+  }
+}
+
+/**
+ * Text Input page class
+ */
+class TextInputPage extends StatelessWidget {
+  const TextInputPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -74,6 +189,10 @@ class InputPage extends StatelessWidget {
               SizedBox(width: 20),
               ElevatedButton(
                 onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SpeechInputPage()) 
+                    );
                 },
                 child: Text('Speech'),
               ),
@@ -89,7 +208,7 @@ class InputPage extends StatelessWidget {
               controller: myController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: 'Enter your speech here...',
+                hintText: 'Input your text here...',
                 hintStyle: TextStyle(color: Colors.white)
               ),
             ),
@@ -196,7 +315,7 @@ class AnalysisPage extends StatelessWidget {
                 onPressed: () {
                   Navigator.pop(
                     context,
-                    MaterialPageRoute(builder: (context) => InputPage()) // Switches but analysis page is
+                    MaterialPageRoute(builder: (context) => TextInputPage()) // Switches but analysis page is
                     );
                 },
                 child: Text("Back"),

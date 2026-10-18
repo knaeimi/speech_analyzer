@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -46,6 +47,23 @@ class Speech extends StatefulWidget {
 // Class where speech library is initialized
 class _SpeechState extends State<Speech> {
   final _plugin = SpeechToTextPro();
+  StreamSubscription? _subscription;
+  String? _text; // make sure this is right
+
+  // Figure out which of these is necessary and which isn't 
+
+  // State (for both modes)
+  List<String> _availableLocales = [];
+  String _selectedLocale = 'en-US';
+  bool _isListening = false;
+  double _volume = 0.0;
+  String _status = 'Idle';
+
+  // Pro Mode State
+  String _finalizedText = '';
+  String _partialText = '';
+  double _wpm = 0.0;
+  int _totalWords = 0;
 
   @override
   void initState() {
@@ -58,12 +76,28 @@ class _SpeechState extends State<Speech> {
       onStatus: (status) => print('Engine Status: $status'),
       onError: (error) => print("Engine Error: $error"),
     );
+    if (isAvailable) {
+      _subscription = _plugin.onTranscriptUpdate.listen((transcript) {
+        setState(() =>
+          _text = transcript.fullText,
+        );
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    _plugin.stop();
+    super.dispose();
   }
 
   // Change, edit, refactor if necessary
   @override
   Widget build(BuildContext context) {
-    return Center();
+    return Center(
+      child: Scaffold(),
+    );
   }
 
 }
@@ -82,6 +116,11 @@ class SpeechInputPage extends StatelessWidget {
     HashMap<String,int> textMap = appState.textMap;
     List<MapEntry<String,int>> textList = appState.textList;
     List<DataRow> dataList = appState.dataList;
+
+    // Giving speech page access to speech state and plug in
+
+    // var speechState = context.watch<_SpeechState>();
+    // var _plugin = speechState._plugin;
 
     return Center(
       child: Scaffold(
@@ -147,30 +186,10 @@ class SpeechInputPage extends StatelessWidget {
               SizedBox(width: 20),
               ElevatedButton(
                 onPressed: () {
-                  textMap.clear();
-                  dataList.clear(); // trim() for leading & trailing spaces that were being counted
-                  wordList = myController.text.trim().toLowerCase().replaceAll(RegExp(r"[,.;@#?!&$'-/()]"), ' ').replaceAll("\n", " ").replaceAll("/t"," ").replaceAll("  ", " ").split(' ');
-                  for (String word in wordList){
-                    textMap.update(word, (value) => ++value, ifAbsent: () => 1);
-                  }
-                  textMap = HashMap.fromEntries(textMap.entries.toList()..sort((e2,e1)=>e1.value.compareTo(e2.value)));
-                  textList = textMap.entries.toList().sublist(0,[10,textMap.entries.toList().length].min);
-                  for (MapEntry<String,int> set in textList){
-                    dataList.add(DataRow(
-                      cells: [
-                        DataCell(
-                          Text(set.key)
-                        ),
-                        DataCell(
-                          Text(set.value.toString())
-                        )
-                      ]
-                      ));
-                  }
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AnalysisPage())
-                    );
+                  // _plugin.onTranscriptUpdate.listen((transcript) {
+                  //   print(transcript.fullText);
+                  //   }
+                  // ); 
                 },
                 child: Text("Submit"),
               ),
@@ -178,8 +197,8 @@ class SpeechInputPage extends StatelessWidget {
           ),
               // Button placement temporary
               ElevatedButton(
-                onPressed: () {
-              
+                onPressed: () async {
+                  // await _plugin.start(localeId: 'en-US');
                 }, 
                 child: Icon(
                   Icons.mic,
@@ -187,7 +206,9 @@ class SpeechInputPage extends StatelessWidget {
                 )
               ),
               ElevatedButton(
-                onPressed: () {}, 
+                onPressed: () async {
+                  // await _plugin.stop();
+                }, 
                 child: Text("Pause")
               ),
               ElevatedButton(

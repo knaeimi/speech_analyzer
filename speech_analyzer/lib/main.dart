@@ -2,11 +2,12 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
-
+import 'package:speech_to_text_pro/speech_to_text_pro.dart';
 void main() {
   runApp(MyApp());
 }
 
+// Can probably just make this a stateful widget then get rid of the speech and speech state classes
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -31,6 +32,40 @@ class MyAppState extends ChangeNotifier {
   final HashMap<String,int> textMap = HashMap<String,int>();
   final List<MapEntry<String,int>> textList = [];
   final List<DataRow> dataList = [];
+
+}
+
+// Class Created for the initialization of speech library
+class Speech extends StatefulWidget {
+  const Speech({super.key});
+
+  @override
+  State<Speech> createState() => _SpeechState();
+}
+
+// Class where speech library is initialized
+class _SpeechState extends State<Speech> {
+  final _plugin = SpeechToTextPro();
+
+  @override
+  void initState() {
+    super.initState();
+    _initSpeech();
+  }
+
+  void _initSpeech() async {
+    bool isAvailable = await _plugin.initialize(
+      onStatus: (status) => print('Engine Status: $status'),
+      onError: (error) => print("Engine Error: $error"),
+    );
+  }
+
+  // Change, edit, refactor if necessary
+  @override
+  Widget build(BuildContext context) {
+    return Center();
+  }
+
 }
 
 /**
@@ -141,6 +176,24 @@ class SpeechInputPage extends StatelessWidget {
               ),
             ],
           ),
+              // Button placement temporary
+              ElevatedButton(
+                onPressed: () {
+              
+                }, 
+                child: Icon(
+                  Icons.mic,
+                  semanticLabel: "Mic button: press and begin speech",
+                )
+              ),
+              ElevatedButton(
+                onPressed: () {}, 
+                child: Text("Pause")
+              ),
+              ElevatedButton(
+                onPressed: () {}, 
+                child: Text("Continue")
+              ),
         ],
       ),
       )

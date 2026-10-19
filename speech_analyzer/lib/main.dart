@@ -29,13 +29,18 @@ class MyApp extends StatelessWidget {
 }
 
 class MyAppState extends ChangeNotifier {
-  final myController = TextEditingController();  
+  final myController = TextEditingController(); 
   HashMap<String,int> textMap = HashMap<String,int>();
   List<MapEntry<String,int>> textList = [];
   List<DataRow> dataList = [];
   List<String> wordList = [];
   List<String> sentenceList = [];
   String initialWords = '';
+
+  
+  // final _plugin = SpeechToTextPro(); 
+  // StreamSubscription? _subscription;
+  // String? _text; // make sure this is right
 
   void baseAnalysis(String words){
     wordList.clear();
@@ -100,6 +105,34 @@ class MyAppState extends ChangeNotifier {
     double average = lengths.reduce((a,b) => a + b) / lengths.length;  
     return average;  
   }
+
+
+  // void _initSpeech() async {
+  //   bool isAvailable = await _plugin.initialize(
+  //     onStatus: (status) => print('Engine Status: $status'),
+  //     onError: (error) => print("Engine Error: $error"),
+  //   );
+  //   if (isAvailable) {
+  //     _subscription = _plugin.onTranscriptUpdate.listen((transcript) {
+  //       // Add if necessary
+  //     });
+  //   }
+  // }
+
+  // @override
+  // void dispose() {
+  //   _subscription?.cancel();
+  //   _plugin.stop();
+  //   super.dispose();
+  // }
+
+  // // Change, edit, refactor if necessary
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Center(
+  //     child: Scaffold(),
+  //   );
+  // }
 }
 
 // Class Created for the initialization of speech library
@@ -159,35 +192,9 @@ class _SpeechState extends State<Speech> {
   }
 
   // Change, edit, refactor if necessary
+  // Speech Input page UI
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Scaffold(),
-    );
-  }
-
-}
-
-/**
- * Speech Input page class
- */
-class SpeechInputPage extends StatelessWidget {
-  const SpeechInputPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    var myController = appState.myController;
-    var wordList = [];
-    HashMap<String,int> textMap = appState.textMap;
-    List<MapEntry<String,int>> textList = appState.textList;
-    List<DataRow> dataList = appState.dataList;
-
-    // Giving speech page access to speech state and plug in
-
-    // var speechState = context.watch<_SpeechState>();
-    // var _plugin = speechState._plugin;
-
     return Center(
       child: Scaffold(
         body: Column(
@@ -207,7 +214,7 @@ class SpeechInputPage extends StatelessWidget {
             children: [
               ElevatedButton.icon(
                 onPressed: () {
-                  textMap.clear();
+                  // textMap.clear();
                   Navigator.pop(
                     context,
                     MaterialPageRoute(builder: (context) => AnalysisPage())
@@ -231,7 +238,7 @@ class SpeechInputPage extends StatelessWidget {
             child: TextField(
               style: TextStyle(color: Colors.white),
               maxLines: 10,
-              controller: myController,
+              // controller: myController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 hintText: 'Speak...',
@@ -245,7 +252,7 @@ class SpeechInputPage extends StatelessWidget {
             children: [
               ElevatedButton(
                 onPressed: () {
-                  myController.clear();
+                  // myController.clear();
                 }, 
                 child: Text("Clear")
                 
@@ -253,10 +260,10 @@ class SpeechInputPage extends StatelessWidget {
               SizedBox(width: 20),
               ElevatedButton(
                 onPressed: () {
-                  // _plugin.onTranscriptUpdate.listen((transcript) {
-                  //   print(transcript.fullText);
-                  //   }
-                  // ); 
+                  _plugin.onTranscriptUpdate.listen((transcript) {
+                    print(transcript.fullText);
+                    }
+                  ); 
                 },
                 child: Text("Submit"),
               ),
@@ -266,7 +273,10 @@ class SpeechInputPage extends StatelessWidget {
               SizedBox(height: 40),
               ElevatedButton(
                 onPressed: () async {
-                  // await _plugin.start(localeId: 'en-US');
+                  await _plugin.start(localeId: 'en-US');
+                  _plugin.onTranscriptUpdate.listen((transcript) => 
+                    print(transcript.fullText),
+                  );
                 }, 
                 child: Icon(
                   Icons.mic,
@@ -276,7 +286,7 @@ class SpeechInputPage extends StatelessWidget {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
-                  // await _plugin.stop();
+                  await _plugin.stop();
                 }, 
                 child: Text("Pause")
               ),
@@ -334,7 +344,7 @@ class TextInputPage extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => SpeechInputPage()) 
+                    MaterialPageRoute(builder: (context) => Speech()) 
                     );
                 },
                 child: Text('Speech'),

@@ -71,7 +71,7 @@ class MyAppState extends ChangeNotifier {
 
     textMap.clear();
     for (String word in wordList){
-      if (!prepositions.contains(word)){
+      if (!prepositions.contains(word)&word.isNotEmpty){
         textMap.update(word, (value) => ++value, ifAbsent: () => 1);
       }
     }

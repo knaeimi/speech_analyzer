@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
 import 'package:speech_to_text_pro/speech_to_text_pro.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 void main() {
   runApp(MyApp());
 }

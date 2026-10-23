@@ -71,7 +71,7 @@ class MyAppState extends ChangeNotifier {
 
     textMap.clear();
     for (String word in wordList){
-      if (!prepositions.contains(word)){
+      if (!prepositions.contains(word)&word.isNotEmpty){
         textMap.update(word, (value) => ++value, ifAbsent: () => 1);
       }
     }
@@ -101,6 +101,9 @@ class MyAppState extends ChangeNotifier {
       if(word.isNotEmpty){
         lengths.add(word.length);
       }
+    }
+    if (lengths.isEmpty){
+      return 0;
     }
     double average = lengths.reduce((a,b) => a + b) / lengths.length;  
     return average;  
@@ -427,14 +430,26 @@ class AnalysisPage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   double average = appState.avgSentenceLength();
-                  showDialog<void>(
+                  if (average==0){
+                    showDialog<void>(
                     context: context,
                     builder: (context) {
                     return AlertDialog(
-                      content: Text("Your average sentence length is ${average.toStringAsFixed(2)} words per sentence."),
+                      content: Text("You need to include a period to return a sentence length."),
                       );
                     },
                   );
+                  }
+                  else {
+                    showDialog<void>(
+                      context: context,
+                      builder: (context) {
+                      return AlertDialog(
+                        content: Text("Your average sentence length is ${average.toStringAsFixed(2)} words per sentence."),
+                        );
+                      },
+                    );
+                  }
                 },
                 child: Text("Average Sentence Length"),
               ),

@@ -105,34 +105,6 @@ class MyAppState extends ChangeNotifier {
     double average = lengths.reduce((a,b) => a + b) / lengths.length;  
     return average;  
   }
-
-
-  // void _initSpeech() async {
-  //   bool isAvailable = await _plugin.initialize(
-  //     onStatus: (status) => print('Engine Status: $status'),
-  //     onError: (error) => print("Engine Error: $error"),
-  //   );
-  //   if (isAvailable) {
-  //     _subscription = _plugin.onTranscriptUpdate.listen((transcript) {
-  //       // Add if necessary
-  //     });
-  //   }
-  // }
-
-  // @override
-  // void dispose() {
-  //   _subscription?.cancel();
-  //   _plugin.stop();
-  //   super.dispose();
-  // }
-
-  // // Change, edit, refactor if necessary
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Center(
-  //     child: Scaffold(),
-  //   );
-  // }
 }
 
 // Class Created for the initialization of speech library
@@ -148,6 +120,8 @@ class _SpeechState extends State<Speech> {
   final _plugin = SpeechToTextPro();
   StreamSubscription? _subscription;
   String? _text; // make sure this is right
+  bool isAvailable = false;
+  // bool hasPermission = await _plugin.hasPermission();
 
   // Figure out which of these is necessary and which isn't 
 
@@ -171,7 +145,13 @@ class _SpeechState extends State<Speech> {
   }
 
   void _initSpeech() async {
-    bool isAvailable = await _plugin.initialize(
+    _plugin.onListeningStateChanged.listen((listening) {
+      setState(() {
+        _isListening = listening;
+        _status = listening ? 'Listening' : 'Idle';
+      });
+    });
+    isAvailable = await _plugin.initialize(
       onStatus: (status) => print('Engine Status: $status'),
       onError: (error) => print("Engine Error: $error"),
     );
@@ -273,10 +253,15 @@ class _SpeechState extends State<Speech> {
               SizedBox(height: 40),
               ElevatedButton(
                 onPressed: () async {
-                  await _plugin.start(localeId: 'en-US');
                   _plugin.onTranscriptUpdate.listen((transcript) => 
-                    print(transcript.fullText),
+                    setState(() {
+                      _finalizedText = transcript.finalizedText;
+                      _partialText = transcript.partialText; 
+                      print(_partialText);
+                    }),
                   );
+                  await _plugin.start(localeId: 'en-US');
+                  Text(_partialText);
                 }, 
                 child: Icon(
                   Icons.mic,
@@ -292,7 +277,9 @@ class _SpeechState extends State<Speech> {
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {}, 
+                onPressed: () {
+                  print(_finalizedText);
+                }, 
                 child: Text("Continue")
               ),
         ],

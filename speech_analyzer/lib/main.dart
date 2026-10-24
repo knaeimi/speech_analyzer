@@ -126,6 +126,7 @@ class _SpeechState extends State<Speech> {
   StreamSubscription? _subscription;
   String? _text; // make sure this is right
   bool isAvailable = false;
+  var micPermission;
   // bool hasPermission = await _plugin.hasPermission();
 
   // Figure out which of these is necessary and which isn't 
@@ -156,16 +157,22 @@ class _SpeechState extends State<Speech> {
         _status = listening ? 'Listening' : 'Idle';
       });
     });
-    isAvailable = await _plugin.initialize(
-      onStatus: (status) => print('Engine Status: $status'),
-      onError: (error) => print("Engine Error: $error"),
-    );
-    if (isAvailable) {
-      _subscription = _plugin.onTranscriptUpdate.listen((transcript) {
-        setState(() =>
-          _text = transcript.fullText,
-        );
-      });
+    
+    micPermission = await Permission.microphone.request();
+    if (micPermission.isGranted) {
+        isAvailable = await _plugin.initialize(
+        onStatus: (status) => print('Engine Status: $status'),
+        onError: (error) => print("Engine Error: $error"),
+      );
+      if (isAvailable) {
+        _subscription = _plugin.onTranscriptUpdate.listen((transcript) {
+          setState(() =>
+            _text = transcript.fullText,
+          );
+        });
+      }
+    } else {
+      print(micPermission.toString());
     }
   }
 

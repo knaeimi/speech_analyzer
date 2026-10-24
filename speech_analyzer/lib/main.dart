@@ -127,6 +127,7 @@ class _SpeechState extends State<Speech> {
   String? _text; // make sure this is right
   bool isAvailable = false;
   var micPermission;
+  var stat;
   // bool hasPermission = await _plugin.hasPermission();
 
   // Figure out which of these is necessary and which isn't 
@@ -159,7 +160,8 @@ class _SpeechState extends State<Speech> {
     });
     
     micPermission = await Permission.microphone.request();
-    if (micPermission.isGranted) {
+    stat = await Permission.microphone.status;
+    // if (micPermission.isGranted) {
         isAvailable = await _plugin.initialize(
         onStatus: (status) => print('Engine Status: $status'),
         onError: (error) => print("Engine Error: $error"),
@@ -171,9 +173,9 @@ class _SpeechState extends State<Speech> {
           );
         });
       }
-    } else {
-      print(micPermission.toString());
-    }
+    // } else {
+    //   print(micPermission.toString());
+    // }
   }
 
   @override
@@ -270,8 +272,10 @@ class _SpeechState extends State<Speech> {
                       _finalizedText = transcript.finalizedText;
                       _partialText = transcript.partialText; 
                       print(_partialText);
+                      print("Print Statement Inside setState: " + stat.toString());
                     }),
                   );
+                  print("Print Statement Outside setState: " + stat.toString());
                   await _plugin.start(localeId: 'en-US');
                   Text(_partialText);
                 }, 

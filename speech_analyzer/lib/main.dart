@@ -267,17 +267,19 @@ class _SpeechState extends State<Speech> {
               SizedBox(height: 40),
               ElevatedButton(
                 onPressed: () async {
-                  _plugin.onTranscriptUpdate.listen((transcript) => 
-                    setState(() {
-                      _finalizedText = transcript.finalizedText;
-                      _partialText = transcript.partialText; 
-                      print(_partialText);
-                      print("Print Statement Inside setState: " + stat.toString());
-                    }),
-                  );
-                  print("Print Statement Outside setState: " + stat.toString());
-                  await _plugin.start(localeId: 'en-US');
-                  Text(_partialText);
+                  if (await Permission.microphone.request().isGranted) {
+                    _plugin.onTranscriptUpdate.listen((transcript) => 
+                      setState(() {
+                        _finalizedText = transcript.finalizedText;
+                        _partialText = transcript.partialText; 
+                        print(_partialText);
+                        print("Print Statement Inside setState: " + stat.toString());
+                      }),
+                    );
+                    print("Print Statement Outside setState: " + stat.toString());
+                    await _plugin.start(localeId: 'en-US');
+                    Text(_partialText);
+                  }
                 }, 
                 child: Icon(
                   Icons.mic,

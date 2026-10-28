@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
 import 'package:speech_to_text_pro/speech_to_text_pro.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:record/record.dart';
 
 void main() {
   runApp(MyApp());
@@ -123,11 +124,14 @@ class Speech extends StatefulWidget {
 // Class where speech library is initialized
 class _SpeechState extends State<Speech> {
   final _plugin = SpeechToTextPro();
+  final recorder = AudioRecorder();
   StreamSubscription? _subscription;
   String? _text; // make sure this is right
   bool isAvailable = false;
   var micPermission;
   var stat;
+
+  final audioFilePath = 'web/myRecording.wav';
   // bool hasPermission = await _plugin.hasPermission();
 
   // Figure out which of these is necessary and which isn't 
@@ -161,7 +165,7 @@ class _SpeechState extends State<Speech> {
     
     micPermission = await Permission.microphone.request();
     stat = await Permission.microphone.status;
-    // if (micPermission.isGranted) {
+    if (await recorder.hasPermission()) {
         isAvailable = await _plugin.initialize(
         onStatus: (status) => print('Engine Status: $status'),
         onError: (error) => print("Engine Error: $error"),
@@ -173,10 +177,19 @@ class _SpeechState extends State<Speech> {
           );
         });
       }
-    // } else {
-    //   print(micPermission.toString());
-    // }
+    } else {
+      print(micPermission.toString());
+    }
   }
+
+  final recordConfig = RecordConfig(
+    encoder: AudioEncoder.pcm16bits,
+    sampleRate: 24000,
+    numChannels: 1,
+    autoGain: true,
+    echoCancel: true,
+    noiseSuppress: true,
+  );  
 
   @override
   void dispose() {
@@ -268,7 +281,12 @@ class _SpeechState extends State<Speech> {
               ElevatedButton(
                 onPressed: () async {
                   if (await Permission.microphone.request().isGranted) {
-                    _plugin.onTranscriptUpdate.listen((transcript) => 
+                    
+                    recorder.start(recordConfig, path: audioFilePath);
+                    final stream = await recorder.startStream(recordConfig);
+                    
+                    stream.listen((liveAudio) {
+                      _plugin.onTranscriptUpdate.listen((transcript) => 
                       setState(() {
                         _finalizedText = transcript.finalizedText;
                         _partialText = transcript.partialText; 
@@ -277,8 +295,11 @@ class _SpeechState extends State<Speech> {
                       }),
                     );
                     print("Print Statement Outside setState: " + stat.toString());
-                    await _plugin.start(localeId: 'en-US');
+                    _plugin.start(localeId: 'en-US');
                     Text(_partialText);
+                    print(_partialText);
+                    print(_finalizedText);
+                    });
                   }
                 }, 
                 child: Icon(
@@ -289,7 +310,9 @@ class _SpeechState extends State<Speech> {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
-                  await _plugin.stop();
+                  // await _plugin.stop();
+                  final path = await recorder.stop();
+                  print(path);
                 }, 
                 child: Text("Pause")
               ),

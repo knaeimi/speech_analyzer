@@ -6,6 +6,7 @@ import 'package:collection/collection.dart';
 import 'package:speech_to_text_pro/speech_to_text_pro.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
+import 'dart:js_interop';
 
 void main() {
   runApp(MyApp());
@@ -133,6 +134,9 @@ class _SpeechState extends State<Speech> {
 
   final audioFilePath = 'web/myRecording.wav';
   // bool hasPermission = await _plugin.hasPermission();
+  @JS()
+  
+  
 
   // Figure out which of these is necessary and which isn't 
 

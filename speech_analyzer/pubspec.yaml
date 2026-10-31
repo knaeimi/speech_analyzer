@@ -35,6 +35,7 @@ dependencies:
   speech_to_text_pro: ^0.0.1
   permission_handler: ^13.0.2
   record: ^7.1.2
+  js: any
 
 dev_dependencies:
   flutter_test:

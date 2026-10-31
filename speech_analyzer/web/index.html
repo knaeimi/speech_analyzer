@@ -42,5 +42,13 @@
     * https://docs.flutter.dev/platform-integration/web/initialization
   -->
   <script src="flutter_bootstrap.js" async></script>
+  <script>
+    import { pipeline } from '@huggingface/transformers';
+    function trans(url){
+      transcriber = pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny.en');
+      print('called');
+      return transcriber(url);
+    }
+  </script>
 </body>
 </html>

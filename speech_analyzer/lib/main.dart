@@ -4,11 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
-import 'package:speech_to_text_pro/speech_to_text_pro.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
-import 'dart:js_interop';
-import 'dart:js_interop_unsafe';
 import 'package:speech_to_text/speech_to_text.dart';
 
 void main() {
@@ -43,11 +40,6 @@ class MyAppState extends ChangeNotifier {
   List<String> wordList = [];
   List<String> sentenceList = [];
   String initialWords = '';
-
-  
-  // final _plugin = SpeechToTextPro(); 
-  // StreamSubscription? _subscription;
-  // String? _text; // make sure this is right
 
   void baseAnalysis(String words){
     wordList.clear();
@@ -125,19 +117,9 @@ class Speech extends StatefulWidget {
   State<Speech> createState() => _SpeechState();
 }
 
-// @JS()
-// external String transcriber(String? url);
-
-// String transcribe(String? url){
-
-//   return '';
-// }
-
 // Class where speech library is initialized
 class _SpeechState extends State<Speech> {
-  final _plugin = SpeechToTextPro();
   final recorder = AudioRecorder();
-  StreamSubscription? _subscription;
   String? _text; // make sure this is right
   bool isAvailable = false;
   var micPermission;
@@ -145,24 +127,12 @@ class _SpeechState extends State<Speech> {
   SpeechToText _speechToText = SpeechToText();
   bool _speechEnabled = false;
   String _lastWords = '';
+  String _currentWords = '';
 
   final audioFilePath = 'web/myRecording.wav';
   // bool hasPermission = await _plugin.hasPermission();
 
   // Figure out which of these is necessary and which isn't 
-
-  // State (for both modes)
-  List<String> _availableLocales = [];
-  String _selectedLocale = 'en-US';
-  bool _isListening = false;
-  double _volume = 0.0;
-  String _status = 'Idle';
-
-  // Pro Mode State
-  String _finalizedText = '';
-  String _partialText = '';
-  double _wpm = 0.0;
-  int _totalWords = 0;
 
   @override
   void initState() {
@@ -173,41 +143,39 @@ class _SpeechState extends State<Speech> {
   void _initSpeech() async {
     _speechEnabled = await _speechToText.initialize();
     setState(() {});
-    
     // maybe remove?
     micPermission = await Permission.microphone.request();
     stat = await Permission.microphone.status;
-    if (await recorder.hasPermission()) {
-        isAvailable = await _plugin.initialize(
-        onStatus: (status) => print('Engine Status: $status'),
-        onError: (error) => print("Engine Error: $error"),
-      );
-      if (isAvailable) {
-        _subscription = _plugin.onTranscriptUpdate.listen((transcript) {
-          setState(() =>
-            _text = transcript.fullText,
-          );
-        });
-      }
-    } else {
-      //print(micPermission.toString());
-    }
   }
 
   void _startListening() async{
+    await Future.delayed(const Duration(milliseconds: 50));
     await _speechToText.listen(onResult: _onSpeechResult);
+    _speechEnabled = true;
     setState(() {});
   }
 
   void _stopListening() async{
     await _speechToText.stop();
+    _speechEnabled = false;
     setState(() {});
   }
 
   void _onSpeechResult(SpeechRecognitionResult result) {
     setState(() {
-      _lastWords = result.recognizedWords;
+      _currentWords = result.recognizedWords;
     });
+  }
+
+  void _statusListener(String status) async {
+    if (status == "done" && _speechEnabled) {
+      setState(() {
+        _lastWords += " $_currentWords ";
+        _currentWords = "";
+        _speechEnabled = false;
+      });
+    }
+    _startListening();
   }
 
   final recordConfig = RecordConfig(
@@ -218,13 +186,6 @@ class _SpeechState extends State<Speech> {
     echoCancel: true,
     noiseSuppress: true,
   );  
-
-  @override
-  void dispose() {
-    _subscription?.cancel();
-    _plugin.stop();
-    super.dispose();
-  }
 
   // Change, edit, refactor if necessary
   // Speech Input page UI
@@ -310,30 +271,8 @@ class _SpeechState extends State<Speech> {
               ElevatedButton(
                 onPressed: () async {
                   if (await Permission.microphone.request().isGranted) {
-                    
                     //recorder.start(recordConfig, path: audioFilePath);
-
                     _startListening();
-
-
-                    //final stream = await recorder.startStream(recordConfig);
-
-                    // currently in terms of speech to text pro, change later
-                    // stream.listen((liveAudio) {
-                    //   _plugin.onTranscriptUpdate.listen((transcript) => 
-                    //   setState(() {
-                    //     _finalizedText = transcript.finalizedText;
-                    //     _partialText = transcript.partialText; 
-                    //     print(_partialText);
-                    //     //print("Print Statement Inside setState: " + stat.toString());
-                    //   }),
-                    //);
-                    //print("Print Statement Outside setState: " + stat.toString());
-                    // _plugin.start(localeId: 'en-US');
-                    // Text(_partialText);
-                    // print(_partialText);
-                    // print(_finalizedText);
-                    //});
                   }
                 }, 
                 child: Icon(
@@ -344,27 +283,16 @@ class _SpeechState extends State<Speech> {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
-
                   _stopListening();
-                  // await _plugin.stop();
-                  final String? path = await recorder.stop();
+                  //final String? path = await recorder.stop();
+                  print('stop');
+                  _statusListener("done");
                   //print(path);
-                  //String output = transcriber(audioFilePath);
-                  print('pause');
-                  print(path);
-                  //String output = trans(path!.toJS);
-                  //JSString value = globalContext.callMethod('trans'.toJS, path!.toJS) as JSString;
                   print(_lastWords);
                 }, 
-                child: Text("Pause")
+                child: Text("Stop")
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  print(_finalizedText);
-                }, 
-                child: Text("Continue")
-              ),
         ],
       ),
       )

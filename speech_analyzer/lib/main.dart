@@ -3,11 +3,13 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text_pro/speech_to_text_pro.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 import 'dart:js_interop';
 import 'dart:js_interop_unsafe';
+import 'package:speech_to_text/speech_to_text.dart';
 
 void main() {
   runApp(MyApp());
@@ -131,9 +133,6 @@ class Speech extends StatefulWidget {
 //   return '';
 // }
 
-@JS('trans')
-external String trans(JSAny? url);
-
 // Class where speech library is initialized
 class _SpeechState extends State<Speech> {
   final _plugin = SpeechToTextPro();
@@ -143,6 +142,9 @@ class _SpeechState extends State<Speech> {
   bool isAvailable = false;
   var micPermission;
   var stat;
+  SpeechToText _speechToText = SpeechToText();
+  bool _speechEnabled = false;
+  String _lastWords = '';
 
   final audioFilePath = 'web/myRecording.wav';
   // bool hasPermission = await _plugin.hasPermission();
@@ -169,13 +171,10 @@ class _SpeechState extends State<Speech> {
   }
 
   void _initSpeech() async {
-    _plugin.onListeningStateChanged.listen((listening) {
-      setState(() {
-        _isListening = listening;
-        _status = listening ? 'Listening' : 'Idle';
-      });
-    });
+    _speechEnabled = await _speechToText.initialize();
+    setState(() {});
     
+    // maybe remove?
     micPermission = await Permission.microphone.request();
     stat = await Permission.microphone.status;
     if (await recorder.hasPermission()) {
@@ -193,6 +192,22 @@ class _SpeechState extends State<Speech> {
     } else {
       //print(micPermission.toString());
     }
+  }
+
+  void _startListening() async{
+    await _speechToText.listen(onResult: _onSpeechResult);
+    setState(() {});
+  }
+
+  void _stopListening() async{
+    await _speechToText.stop();
+    setState(() {});
+  }
+
+  void _onSpeechResult(SpeechRecognitionResult result) {
+    setState(() {
+      _lastWords = result.recognizedWords;
+    });
   }
 
   final recordConfig = RecordConfig(
@@ -280,10 +295,11 @@ class _SpeechState extends State<Speech> {
               SizedBox(width: 20),
               ElevatedButton(
                 onPressed: () {
-                  _plugin.onTranscriptUpdate.listen((transcript) {
-                    print(transcript.fullText);
-                    }
-                  ); 
+                  print(_lastWords);
+                  // _plugin.onTranscriptUpdate.listen((transcript) {
+                  //   print(transcript.fullText);
+                  //}
+                  //); 
                 },
                 child: Text("Submit"),
               ),
@@ -295,7 +311,11 @@ class _SpeechState extends State<Speech> {
                 onPressed: () async {
                   if (await Permission.microphone.request().isGranted) {
                     
-                    recorder.start(recordConfig, path: audioFilePath);
+                    //recorder.start(recordConfig, path: audioFilePath);
+
+                    _startListening();
+
+
                     //final stream = await recorder.startStream(recordConfig);
 
                     // currently in terms of speech to text pro, change later
@@ -324,6 +344,8 @@ class _SpeechState extends State<Speech> {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
+
+                  _stopListening();
                   // await _plugin.stop();
                   final String? path = await recorder.stop();
                   //print(path);
@@ -331,8 +353,8 @@ class _SpeechState extends State<Speech> {
                   print('pause');
                   print(path);
                   //String output = trans(path!.toJS);
-                  JSString value = globalContext.callMethod('trans'.toJS, path!.toJS) as JSString;
-                  print(value.toDart);
+                  //JSString value = globalContext.callMethod('trans'.toJS, path!.toJS) as JSString;
+                  print(_lastWords);
                 }, 
                 child: Text("Pause")
               ),

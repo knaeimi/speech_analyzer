@@ -36,6 +36,7 @@ dependencies:
   permission_handler: ^13.0.2
   record: ^7.1.2
   js: any
+  speech_to_text: ^7.5.0
 #   web_javascript: ^0.1.0 #Latest version
 
 # web_javascript:

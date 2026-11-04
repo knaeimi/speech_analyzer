@@ -26,6 +26,11 @@ public final class GeneratedPluginRegistrant {
       Log.e(TAG, "Error registering plugin record_android, com.llfbandit.record.RecordPlugin", e);
     }
     try {
+      flutterEngine.getPlugins().add(new com.csdcorp.speech_to_text.SpeechToTextPlugin());
+    } catch (Exception e) {
+      Log.e(TAG, "Error registering plugin speech_to_text, com.csdcorp.speech_to_text.SpeechToTextPlugin", e);
+    }
+    try {
       flutterEngine.getPlugins().add(new com.example.speech_to_text_pro.SpeechToTextProPlugin());
     } catch (Exception e) {
       Log.e(TAG, "Error registering plugin speech_to_text_pro, com.example.speech_to_text_pro.SpeechToTextProPlugin", e);

@@ -9,6 +9,7 @@
 #include <permission_handler_windows/permission_handler_windows_plugin.h>
 #include <record_windows/record_windows_plugin_c_api.h>
 #include <speech_to_text_pro/speech_to_text_pro_plugin_c_api.h>
+#include <speech_to_text_windows/speech_to_text_windows.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
   PermissionHandlerWindowsPluginRegisterWithRegistrar(
@@ -17,4 +18,6 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("RecordWindowsPluginCApi"));
   SpeechToTextProPluginCApiRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("SpeechToTextProPluginCApi"));
+  SpeechToTextWindowsRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("SpeechToTextWindows"));
 }

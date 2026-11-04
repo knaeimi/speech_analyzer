@@ -5,6 +5,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'analysisPage.dart';
+import 'myApp.dart';
+import 'package:provider/provider.dart';
+
 
 // Class Created for the initialization of speech library
 class Speech extends StatefulWidget {
@@ -44,17 +47,26 @@ class _SpeechState extends State<Speech> {
     stat = await Permission.microphone.status;
   }
 
-  void _startListening() async{
+  void _startListening() async {
     await Future.delayed(const Duration(milliseconds: 50));
-    await _speechToText.listen(onResult: _onSpeechResult);
-    _speechEnabled = true;
-    setState(() {});
+    await _speechToText.listen(
+      onResult: _onSpeechResult, 
+      listenOptions: 
+      SpeechListenOptions(
+        listenMode: ListenMode.dictation,
+        cancelOnError: false,
+        partialResults: true),
+    );
+    setState(() {
+      _speechEnabled = true;
+    });
   }
 
   void _stopListening() async{
+    setState(() {
+      _speechEnabled = false;
+    });
     await _speechToText.stop();
-    _speechEnabled = false;
-    setState(() {});
   }
 
   void _onSpeechResult(SpeechRecognitionResult result) {
@@ -87,6 +99,9 @@ class _SpeechState extends State<Speech> {
   // Speech Input page UI
   @override
   Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var myController = appState.myController;
+
     return Center(
       child: Scaffold(
         body: Column(
@@ -152,11 +167,7 @@ class _SpeechState extends State<Speech> {
               SizedBox(width: 20),
               ElevatedButton(
                 onPressed: () {
-                  print(_lastWords);
-                  // _plugin.onTranscriptUpdate.listen((transcript) {
-                  //   print(transcript.fullText);
-                  //}
-                  //); 
+                  print(_lastWords); 
                 },
                 child: Text("Submit"),
               ),
@@ -185,6 +196,12 @@ class _SpeechState extends State<Speech> {
                   _statusListener("done");
                   //print(path);
                   print(_lastWords);
+
+                  appState.baseAnalysis(_lastWords);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AnalysisPage())
+                    );
                 }, 
                 child: Text("Stop")
               ),

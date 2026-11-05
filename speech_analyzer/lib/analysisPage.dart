@@ -1,13 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:collection';
 import 'myApp.dart';
 import 'textInputPage.dart';
 
 /**
  * Analysis page class
  */
-class AnalysisPage extends StatelessWidget {
+class AnalysisPage extends StatefulWidget {
   const AnalysisPage({super.key});
+
+  @override
+  State<AnalysisPage> createState() => AnalysisState();
+}
+
+// Class where speech library is initialized
+class AnalysisState extends State<AnalysisPage> {
+  HashMap<String,bool?> selectedText = HashMap<String,bool?>();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void selectWord(String word, bool? on) {
+    setState(() {
+      selectedText.update(word,(value)=> on, ifAbsent: () => false);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
@@ -27,19 +48,49 @@ class AnalysisPage extends StatelessWidget {
             )
           ),
           SizedBox(height: 20),
+          // Source - https://stackoverflow.com/a/67434006
+          // Posted by LihnNguyen
+          // Retrieved 2026-10-09, License - CC BY-SA 4.0
+          DataTable(
+            dataTextStyle: TextStyle(color: Colors.white),
+            columnSpacing: 50,
+            columns: const <DataColumn>[
+              DataColumn(
+                label: Text(
+                  'Select',
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  'Word',
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  'Times used',
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                headingRowAlignment: MainAxisAlignment.center
+              ),
+            
+            ],
+            rows: dataList
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
                 onPressed: () {
                   dataList.clear();
-                  appState.removePrepositions();
+                  appState.removeSelected();
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                     builder: (BuildContext context) => AnalysisPage()));
                 },
-                child: Text("Remove Prepositions"),
+                child: Text("Remove Selected"),
               ),SizedBox(width: 20),
               ElevatedButton(
                 onPressed: () {
@@ -80,30 +131,6 @@ class AnalysisPage extends StatelessWidget {
             ],
           ),
           SizedBox(height:20),
-          // Source - https://stackoverflow.com/a/67434006
-          // Posted by LihnNguyen
-          // Retrieved 2026-10-09, License - CC BY-SA 4.0
-          DataTable(
-            dataTextStyle: TextStyle(color: Colors.white),
-            columnSpacing: 50,
-            columns: const <DataColumn>[
-              DataColumn(
-                label: Text(
-                  'Word',
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Times used',
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                ),
-                headingRowAlignment: MainAxisAlignment.center
-              ),
-            
-            ],
-            rows: dataList
-          ),
         ],
       ),
       )

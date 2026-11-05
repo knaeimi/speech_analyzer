@@ -38,12 +38,6 @@ dependencies:
   js: any
   speech_to_text: ^7.5.0
   collection: ^1.19.1
-#   web_javascript: ^0.1.0 #Latest version
-
-# web_javascript:
-#   packages:
-#     - name: 
-
 
 dev_dependencies:
   flutter_test:

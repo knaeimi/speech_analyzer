@@ -36,30 +36,31 @@ class MyAppState extends ChangeNotifier {
   List<String> sentenceList = [];
   List<String> selected = [];
   String initialWords = '';
-  //var analysis = AnalysisPage();
 
   void baseAnalysis(String words){
     wordList.clear();
     textMap.clear();
     selectedText.clear();
+    dataList.clear(); //reset each rows state
     initialWords = words;
     wordList = words.replaceAll(RegExp(r"[,.;@#?!&$'-/()]"), '').replaceAll("\n", " ").replaceAll("/t"," ").replaceAll("  ", " ").split(' ');
+    
     for (String word in wordList){ // Empty input was counted as word, this check fixes that and also don't need trim anymore
       if (word.isNotEmpty) textMap.update(word, (value) => ++value, ifAbsent: () => 1);
     }
+
     textMap = HashMap.fromEntries(textMap.entries.toList()..sort((e2,e1)=>e1.value.compareTo(e2.value)));
     textList = textMap.entries.toList().sublist(0,[10,textMap.entries.toList().length].min);
+    populateMaps(textList);
+  }
+
+  void populateMaps(List<MapEntry<String,int>> textList){
     for (MapEntry<String,int> set in textList){
-      selectedText.update(set.key,(value)=> false, ifAbsent: () => false);
+      selectedText.putIfAbsent(set.key, () => false); // only set to false if not in map, otherwise it just keeps resetting to false
       dataList.add(DataRow(
         cells: [
           DataCell(
-            Checkbox(
-              value: selectedText[set.key],
-              onChanged: (bool? on) {
-                analysis.currentState?.selectWord(set.key, on);
-              },
-            )
+           createCheckbox(selectedText, set)
           ),
           DataCell(
             Text(set.key)
@@ -70,7 +71,19 @@ class MyAppState extends ChangeNotifier {
         ]
       ));
     }
-    print(selectedText);
+  }
+
+  Checkbox createCheckbox( HashMap<String,bool?>  selectedText, MapEntry<String,int> set){
+    return Checkbox(
+      value: selectedText[set.key],
+      onChanged: (bool? value) { 
+        selectedText[set.key] = value; //flutter handles updating based on prev value
+
+        dataList.clear(); // clear old state before repopulating
+        populateMaps(textList);    
+        notifyListeners(); //have to use this instead of setState bc we extend ChangeNotifier
+      },
+    );
   }
 
   void removePrepositions(){
@@ -100,9 +113,6 @@ class MyAppState extends ChangeNotifier {
 
   void removeSelected(){
     print(selectedText);
-  }
-
-  void selectWord(){
   }
 
   double avgSentenceLength(){

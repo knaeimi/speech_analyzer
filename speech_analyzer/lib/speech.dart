@@ -28,10 +28,7 @@ class _SpeechState extends State<Speech> {
   String _lastWords = '';
   String _currentWords = '';
 
-  final audioFilePath = 'web/myRecording.wav';
-  // bool hasPermission = await _plugin.hasPermission();
-
-  // Figure out which of these is necessary and which isn't 
+  // final audioFilePath = 'web/myRecording.wav';
 
   @override
   void initState() {
@@ -42,11 +39,13 @@ class _SpeechState extends State<Speech> {
   void _initSpeech() async {
     _speechEnabled = await _speechToText.initialize();
     setState(() {});
+
     // maybe remove?
     micPermission = await Permission.microphone.request();
     stat = await Permission.microphone.status;
   }
 
+  // TODO: change such that we no longer use the delay. Have something on UI that shows when speechToText starts listening
   void _startListening() async {
     await Future.delayed(const Duration(milliseconds: 50));
     await _speechToText.listen(
@@ -62,7 +61,7 @@ class _SpeechState extends State<Speech> {
     });
   }
 
-  void _stopListening() async{
+  Future _stopListening() async {
     setState(() {
       _speechEnabled = false;
     });
@@ -100,7 +99,7 @@ class _SpeechState extends State<Speech> {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-    var myController = appState.myController;
+    // var myController = appState.myController;
 
     return Center(
       child: Scaffold(
@@ -148,7 +147,7 @@ class _SpeechState extends State<Speech> {
               // controller: myController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: 'Speak...',
+                hintText: _currentWords,
                 hintStyle: TextStyle(color: Colors.white)
               ),
             ),
@@ -167,7 +166,7 @@ class _SpeechState extends State<Speech> {
               SizedBox(width: 20),
               ElevatedButton(
                 onPressed: () {
-                  print(_lastWords); 
+                  print(_currentWords); 
                 },
                 child: Text("Submit"),
               ),
@@ -190,18 +189,17 @@ class _SpeechState extends State<Speech> {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
-                  _stopListening();
-                  //final String? path = await recorder.stop();
+                  await _stopListening();
                   print('stop');
                   _statusListener("done");
-                  //print(path);
                   print(_lastWords);
 
                   appState.baseAnalysis(_lastWords);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AnalysisPage())
-                    );
+                  
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) => AnalysisPage())
+                  //   );
                 }, 
                 child: Text("Stop")
               ),

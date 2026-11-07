@@ -27,6 +27,7 @@ class _SpeechState extends State<Speech> {
   bool _speechEnabled = false;
   String _lastWords = '';
   String _currentWords = '';
+  double _pluginConfidenceScore = 1.0;
 
   // final audioFilePath = 'web/myRecording.wav';
 
@@ -45,10 +46,11 @@ class _SpeechState extends State<Speech> {
     stat = await Permission.microphone.status;
   }
 
-  // TODO: change such that we no longer use the delay. Have something on UI that shows when speechToText starts listening
+  // TODO: change such that we no longer use the delay. 
+  // Have something on UI that shows when speechToText starts listening
   void _startListening() async {
     await Future.delayed(const Duration(milliseconds: 50));
-    await _speechToText.listen(
+    _speechToText.listen(
       onResult: _onSpeechResult, 
       listenOptions: 
       SpeechListenOptions(
@@ -61,16 +63,20 @@ class _SpeechState extends State<Speech> {
     });
   }
 
+  // TODO: speechToText does not stop listening when you click stop
   Future _stopListening() async {
     setState(() {
       _speechEnabled = false;
     });
-    await _speechToText.stop();
+    _speechToText.stop();
   }
 
   void _onSpeechResult(SpeechRecognitionResult result) {
     setState(() {
       _currentWords = result.recognizedWords;
+      if (result.hasConfidenceRating && result.confidence > 0) {
+        _pluginConfidenceScore = result.confidence;
+      }
     });
   }
 
@@ -166,14 +172,20 @@ class _SpeechState extends State<Speech> {
               SizedBox(width: 20),
               ElevatedButton(
                 onPressed: () {
-                  print(_currentWords); 
+                  _currentWords = _currentWords.toLowerCase();
+                  appState.baseAnalysis(_currentWords);
+                  print(_pluginConfidenceScore);
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AnalysisPage())
+                    ); 
                 },
                 child: Text("Submit"),
               ),
             ],
           ),
-              // Button placement temporary
-              SizedBox(height: 40),
+          SizedBox(height: 40),
               ElevatedButton(
                 onPressed: () async {
                   if (await Permission.microphone.request().isGranted) {
@@ -187,6 +199,8 @@ class _SpeechState extends State<Speech> {
                 )
               ),
               SizedBox(height: 20),
+              
+              // TODO: speechToText does not stop listening when you click stop
               ElevatedButton(
                 onPressed: () async {
                   await _stopListening();
@@ -195,11 +209,6 @@ class _SpeechState extends State<Speech> {
                   print(_lastWords);
 
                   appState.baseAnalysis(_lastWords);
-                  
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => AnalysisPage())
-                  //   );
                 }, 
                 child: Text("Stop")
               ),

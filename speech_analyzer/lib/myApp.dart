@@ -111,8 +111,42 @@ class MyAppState extends ChangeNotifier {
     }
   }
 
+  /**
+   * TODO: Fix
+   * iterate over selected text map
+   *  if a word is mapped to true, search for it in the text map and remove it from both
+   */
   void removeSelected(){
     print(selectedText);
+
+    /* 
+    *Iterate over selected text and remove words that have selected from both maps 
+    */
+    
+    // selectedText.forEach((word, value) {
+    //   if (value == true) {
+    //     textMap.remove(word);
+    //     selectedText.remove(word);
+    //   }
+    // });
+
+    /*
+      * Update Analysis UI in response
+    */
+    // textMap = HashMap.fromEntries(textMap.entries.toList()..sort((e2,e1)=>e1.value.compareTo(e2.value)));
+    // textList = textMap.entries.toList().sublist(0,[10,textMap.entries.toList().length].min);
+    // for (MapEntry<String,int> set in textList){
+    //   dataList.add(DataRow(
+    //     cells: [
+    //       DataCell(
+    //         Text(set.key)
+    //       ),
+    //       DataCell(
+    //         Text(set.value.toString())
+    //       )
+    //     ]
+    //   ));
+    // }
   }
 
   double avgSentenceLength(){

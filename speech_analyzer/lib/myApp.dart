@@ -87,7 +87,7 @@ class MyAppState extends ChangeNotifier {
   }
 
   void removePrepositions(){
-    List<String> prepositions = ['the','a','an','is','am','are','be','do','to','it','and','of','that','at','was','had'];
+   List<String> prepositions = ['the','a','an','is','am','are','be','do','to','it','and','of','that','at','was','had'];
 
     textMap.clear();
     for (String word in wordList){
@@ -97,56 +97,23 @@ class MyAppState extends ChangeNotifier {
     }
     textMap = HashMap.fromEntries(textMap.entries.toList()..sort((e2,e1)=>e1.value.compareTo(e2.value)));
     textList = textMap.entries.toList().sublist(0,[10,textMap.entries.toList().length].min);
-    for (MapEntry<String,int> set in textList){
-      dataList.add(DataRow(
-        cells: [
-          DataCell(
-            Text(set.key)
-          ),
-          DataCell(
-            Text(set.value.toString())
-          )
-        ]
-      ));
-    }
+    populateMaps(textList); // if we still want to use removePrepositions later, we need to use populateMaps for the checkbox column
   }
 
-  /**
-   * TODO: Fix
-   * iterate over selected text map
-   *  if a word is mapped to true, search for it in the text map and remove it from both
-   */
-  void removeSelected(){
-    print(selectedText);
-
-    /* 
-    *Iterate over selected text and remove words that have selected from both maps 
-    */
+  void removeSelected(){ //very similar to removePrepositions
+    textMap.clear();
     
-    // selectedText.forEach((word, value) {
-    //   if (value == true) {
-    //     textMap.remove(word);
-    //     selectedText.remove(word);
-    //   }
-    // });
+    for (String word in wordList){
+      bool selected = selectedText.containsKey(word) && selectedText[word] == false;
 
-    /*
-      * Update Analysis UI in response
-    */
-    // textMap = HashMap.fromEntries(textMap.entries.toList()..sort((e2,e1)=>e1.value.compareTo(e2.value)));
-    // textList = textMap.entries.toList().sublist(0,[10,textMap.entries.toList().length].min);
-    // for (MapEntry<String,int> set in textList){
-    //   dataList.add(DataRow(
-    //     cells: [
-    //       DataCell(
-    //         Text(set.key)
-    //       ),
-    //       DataCell(
-    //         Text(set.value.toString())
-    //       )
-    //     ]
-    //   ));
-    // }
+      if (selected){ // if word is in wordList but hasn't been selected, keep it in the textMap
+        textMap.update(word, (value) => ++value, ifAbsent: () => 1); //now only unselected words are in textMap
+      }
+      
+    }
+    textMap = HashMap.fromEntries(textMap.entries.toList()..sort((e2,e1)=>e1.value.compareTo(e2.value)));
+    textList = textMap.entries.toList().sublist(0,[10,textMap.entries.toList().length].min);
+    populateMaps(textList);
   }
 
   double avgSentenceLength(){

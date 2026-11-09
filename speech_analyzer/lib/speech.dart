@@ -5,7 +5,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'analysisPage.dart';
-import 'myApp.dart';
+import 'controllers/analysis_controller.dart';
 import 'package:provider/provider.dart';
 
 
@@ -104,9 +104,6 @@ class _SpeechState extends State<Speech> {
   // Speech Input page UI
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    // var myController = appState.myController;
-
     return Center(
       child: Scaffold(
         body: Column(
@@ -173,7 +170,7 @@ class _SpeechState extends State<Speech> {
               ElevatedButton(
                 onPressed: () {
                   _currentWords = _currentWords.toLowerCase();
-                  appState.baseAnalysis(_currentWords);
+                  context.read<AnalysisController>().analyze(_currentWords);
                   print(_pluginConfidenceScore);
 
                   Navigator.push(
@@ -204,11 +201,12 @@ class _SpeechState extends State<Speech> {
               ElevatedButton(
                 onPressed: () async {
                   await _stopListening();
+                  if (!context.mounted) return;
                   print('stop');
                   _statusListener("done");
                   print(_lastWords);
 
-                  appState.baseAnalysis(_lastWords);
+                  context.read<AnalysisController>().analyze(_lastWords);
                 }, 
                 child: Text("Stop")
               ),

@@ -1,38 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:collection';
-import 'myApp.dart';
-import 'textInputPage.dart';
+import 'controllers/analysis_controller.dart';
 
 /**
  * Analysis page class
  */
-class AnalysisPage extends StatefulWidget {
+class AnalysisPage extends StatelessWidget{
   const AnalysisPage({super.key});
 
   @override
-  State<AnalysisPage> createState() => AnalysisState();
-}
-
-// Class where speech library is initialized
-class AnalysisState extends State<AnalysisPage> {
-  HashMap<String,bool?> selectedText = HashMap<String,bool?>();
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  void selectWord(String word, bool? on) {
-    setState(() {
-      selectedText.update(word,(value)=> on, ifAbsent: () => false);
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    List<DataRow> dataList = appState.dataList;
+    final state = context.watch<AnalysisController>().state;
 
     return Scaffold(
       body: Center( 
@@ -76,56 +54,51 @@ class AnalysisState extends State<AnalysisPage> {
               ),
             
             ],
-            rows: dataList
+            rows: [
+              for(final entry in state.displayedWords)
+                DataRow(
+                  key: ValueKey(entry.word),
+                  cells: [
+                    DataCell(
+                      Checkbox(
+                        value: state.selectedWords.contains(entry.word),
+                        onChanged: (value) => context
+                            .read<AnalysisController>()
+                            .setWordSelected(entry.word, value ?? false),
+                      ),
+                    ),
+                    DataCell(Text(entry.word)),
+                    DataCell(Text(entry.count.toString())),
+                  ],
+                ),
+            ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
-                onPressed: () {
-                  dataList.clear();
-                  appState.removeSelected();
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                    builder: (BuildContext context) => AnalysisPage()));
-                },
+                onPressed: () =>
+                  context.read<AnalysisController>().removeSelected(),
                 child: Text("Remove Selected"),
               ),SizedBox(width: 20),
               ElevatedButton(
                 onPressed: () {
-                  double average = appState.avgSentenceLength();
-                  if (average==0){
-                    showDialog<void>(
+                  final average = context
+                    .read<AnalysisController>()
+                    .averageSentenceLength();
+                  final message = average == 0
+                    ? 'You need to include a period to return a sentence length.'
+                    : 'Your average sentence length is ${average.toStringAsFixed(2)} words per sentence.';
+                  showDialog<void>(
                     context: context,
-                    builder: (context) {
-                    return AlertDialog(
-                      content: Text("You need to include a period to return a sentence length."),
-                      );
-                    },
+                    builder: (context) => AlertDialog(content: Text(message)),
                   );
-                  }
-                  else {
-                    showDialog<void>(
-                      context: context,
-                      builder: (context) {
-                      return AlertDialog(
-                        content: Text("Your average sentence length is ${average.toStringAsFixed(2)} words per sentence."),
-                        );
-                      },
-                    );
-                  }
                 },
                 child: Text("Average Sentence Length"),
               ),
               SizedBox(width: 20),
               ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(
-                    context,
-                    MaterialPageRoute(builder: (context) => TextInputPage()) // Switches but analysis page is
-                    );
-                },
+                onPressed: () => Navigator.pop(context),
                 child: Text("Back"),
               ),
             ],
@@ -136,5 +109,4 @@ class AnalysisState extends State<AnalysisPage> {
       )
     );
   }
-
 }

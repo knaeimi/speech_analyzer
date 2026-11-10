@@ -1,24 +1,32 @@
-import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'analysisPage.dart';
 import 'speech.dart';
-import 'myApp.dart';
+import 'controllers/analysis_controller.dart';
 
 /**
  * Text Input page class
  */
-class TextInputPage extends StatelessWidget {
+class TextInputPage extends StatefulWidget {
   const TextInputPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    var myController = appState.myController;
-    HashMap<String,int> textMap = appState.textMap;
-    List<DataRow> dataList = appState.dataList;
-    String words = '';
+  State<TextInputPage> createState()  => _TextInputPageState();
 
+}
+
+class _TextInputPageState extends State<TextInputPage> {
+  final _textController = TextEditingController();
+
+
+  @override
+  void dispose(){
+    _textController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Center(
       child: Scaffold(
         body: Column(
@@ -38,7 +46,7 @@ class TextInputPage extends StatelessWidget {
             children: [
               ElevatedButton.icon(
                 onPressed: () {
-                  textMap.clear();
+                  context.read<AnalysisController>().clearWordCounts();
                 },
                 label: Text('Text'),
               ),
@@ -61,7 +69,7 @@ class TextInputPage extends StatelessWidget {
             child: TextField(
               style: TextStyle(color: Colors.white),
               maxLines: 10,
-              controller: myController,
+              controller: _textController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 hintText: 'Input your text here...',
@@ -75,17 +83,14 @@ class TextInputPage extends StatelessWidget {
             children: [
               ElevatedButton(
                 onPressed: () {
-                  myController.clear();
+                  _textController.clear();
                 }, 
                 child: Text("Clear")
               ),
               SizedBox(width: 20),
               ElevatedButton(
                 onPressed: () {
-                  textMap.clear();
-                  dataList.clear(); 
-                  words = myController.text.toLowerCase();
-                  appState.baseAnalysis(words);
+                  context.read<AnalysisController>().analyze(_textController.text.toLowerCase());
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => AnalysisPage())

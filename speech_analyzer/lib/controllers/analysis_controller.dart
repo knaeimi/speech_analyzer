@@ -39,6 +39,7 @@ class AnalysisController extends ChangeNotifier {
     notifyListeners();
   }
 
+  //TODO: This does not work anymore....
   void removeSelected(){
     if (_state.displayedWords.isEmpty){
       return;

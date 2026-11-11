@@ -19,7 +19,6 @@ class Speech extends StatefulWidget {
 
 // Class where speech library is initialized
 class _SpeechState extends State<Speech> {
-  final recorder = AudioRecorder();
   bool isAvailable = false;
   var micPermission;
   var stat;
@@ -28,8 +27,6 @@ class _SpeechState extends State<Speech> {
   String _lastWords = '';
   String _currentWords = '';
   double _pluginConfidenceScore = 1.0;
-
-  // final audioFilePath = 'web/myRecording.wav';
 
   @override
   void initState() {
@@ -90,15 +87,6 @@ class _SpeechState extends State<Speech> {
     }
     _startListening();
   }
-
-  final recordConfig = RecordConfig(
-    encoder: AudioEncoder.pcm16bits,
-    sampleRate: 24000,
-    numChannels: 1,
-    autoGain: true,
-    echoCancel: true,
-    noiseSuppress: true,
-  );  
 
   // Change, edit, refactor if necessary
   // Speech Input page UI

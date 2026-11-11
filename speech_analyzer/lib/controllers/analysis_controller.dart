@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:speech_analyzer/models/word_frequency.dart';
 import '../models/analysis_state.dart';
 import '../services/text_analayzer.dart';
 
@@ -39,12 +40,19 @@ class AnalysisController extends ChangeNotifier {
     notifyListeners();
   }
 
-  //TODO: This does not work anymore....
   void removeSelected(){
     if (_state.displayedWords.isEmpty){
       return;
     }
-    _state = _state.copyWith(displayedWords: []);
+
+    final displayed = [..._state.displayedWords];
+    for(final wordFrequency in _state.displayedWords){ 
+      if (_state.selectedWords.contains(wordFrequency.word)){
+        displayed.remove(wordFrequency);
+      }
+        
+    }
+    _state = _state.copyWith(displayedWords: displayed);
     notifyListeners();
   }
 

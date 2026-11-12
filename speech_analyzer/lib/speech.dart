@@ -116,33 +116,40 @@ class _SpeechState extends State<Speech> {
                     MaterialPageRoute(builder: (context) => AnalysisPage())
                     );
                 },
-                label: Text('Text'),
-                
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                ),
+                label: Text(
+                  'Text',
+                  style: TextStyle(
+                    color: Colors.white,
+                    decorationColor: Colors.white,
+                    fontSize: 18 
+                  )
+                ),
               ),
               SizedBox(width: 20),
               ElevatedButton(
                 onPressed: () {
                 },
-                child: Text('Speech'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                ),
+                child: Text(
+                  'Speech',
+                  style: TextStyle(
+                    decoration: TextDecoration.underline,
+                    color: Colors.white,
+                    decorationColor: Colors.white,
+                    fontSize: 18 
+                  )
+                ),
               ),
             ],
           ),
           SizedBox(height: 30),
-          SizedBox(
-            height:200,
-            width:500,
-            child: TextField(
-              style: TextStyle(color: Colors.white),
-              maxLines: 10,
-              // controller: myController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: _currentWords,
-                hintStyle: TextStyle(color: Colors.white)
-              ),
-            ),
-          ),
-          SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -167,9 +174,7 @@ class _SpeechState extends State<Speech> {
                 },
                 child: Text("Submit"),
               ),
-            ],
-          ),
-          SizedBox(height: 40),
+              SizedBox(width:20),
               ElevatedButton(
                 onPressed: () async {
                   if (await Permission.microphone.request().isGranted) {
@@ -182,8 +187,7 @@ class _SpeechState extends State<Speech> {
                   semanticLabel: "Mic button: press and begin speech",
                 )
               ),
-              SizedBox(height: 20),
-              
+              SizedBox(width: 20),
               // TODO: speechToText does not stop listening when you click stop
               ElevatedButton(
                 onPressed: () async {
@@ -197,7 +201,39 @@ class _SpeechState extends State<Speech> {
                 }, 
                 child: Text("Stop")
               ),
-              SizedBox(height: 20),
+            ],
+          ),
+          SizedBox(height:30),
+          SizedBox(
+            height:200,
+            width:500,
+            child: TextField(
+              style: TextStyle(color: Colors.white),
+              maxLines: 10,
+              // controller: myController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: _currentWords,
+                hintStyle: TextStyle(color: Colors.white)
+              ),
+            ),
+          ),
+          SizedBox(height:30),
+          Container(
+            width: 500,
+            height: 200,
+            padding: EdgeInsetsGeometry.fromLTRB(10,10,10,10),
+            decoration: BoxDecoration(border: Border.all(color: Colors.white)),
+            child: SingleChildScrollView(
+              child: Text(
+                _currentWords,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: Colors.white),
+                softWrap: true,
+                maxLines: 20,
+              )
+            ),
+          )
         ],
       ),
       )

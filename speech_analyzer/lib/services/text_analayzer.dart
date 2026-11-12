@@ -21,13 +21,13 @@ class TextAnalayzer {
       }
     }
 
-    final entries = counts.entries.toList()
+    final sortedEntries = counts.entries.toList()
       ..sort((e2,e1)=>e1.value.compareTo(e2.value));
-    final possiblySortedCounts = HashMap<String, int>.fromEntries(entries); //TODO: This doesn't always work
+    final entryCountsMap = HashMap<String, int>.fromEntries(sortedEntries); 
     return AnalysisState(
       sourceText: text,
-      wordCounts: possiblySortedCounts,
-      displayedWords: possiblySortedCounts.entries
+      wordCounts: entryCountsMap,
+      displayedWords: sortedEntries
         .take(10)
         .map((entry) => WordFrequency(word: entry.key, count: entry.value))
         .toList(),

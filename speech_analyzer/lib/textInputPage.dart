@@ -48,7 +48,19 @@ class _TextInputPageState extends State<TextInputPage> {
                 onPressed: () {
                   context.read<AnalysisController>().clearWordCounts();
                 },
-                label: Text('Text'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                ),
+                label: Text(
+                  'Text',
+                  style: TextStyle(
+                    decoration: TextDecoration.underline,
+                    color: Colors.white,
+                    decorationColor: Colors.white,
+                    fontSize: 18 
+                  )
+                ),
               ),
               SizedBox(width: 20),
               ElevatedButton(
@@ -58,7 +70,18 @@ class _TextInputPageState extends State<TextInputPage> {
                     MaterialPageRoute(builder: (context) => Speech()) 
                     );
                 },
-                child: Text('Speech'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                ),
+                child: Text(
+                  'Speech',
+                  style: TextStyle(
+                    color: Colors.white,
+                    decorationColor: Colors.white,
+                    fontSize: 18 
+                  )
+                ),
               ),
             ],
           ),

@@ -182,32 +182,6 @@ class _SpeechState extends State<Speech> {
                 child: Text("Submit"),
               ),
               SizedBox(width:20),
-              ElevatedButton(
-                onPressed: () async {
-                  if (await Permission.microphone.request().isGranted) {
-                    //recorder.start(recordConfig, path: audioFilePath);
-                    _startListening();
-                  }
-                }, 
-                child: Icon(
-                  Icons.mic,
-                  semanticLabel: "Mic button: press and begin speech",
-                )
-              ),
-              SizedBox(width: 20),
-              // TODO: speechToText does not stop listening when you click stop
-              ElevatedButton(
-                onPressed: () async {
-                  await _stopListening();
-                  if (!context.mounted) return;
-                  print('stop');
-                  _statusListener("done");
-                  print(_lastWords);
-
-                  context.read<AnalysisController>().analyze(_lastWords);
-                }, 
-                child: Text("Stop")
-              ),
             ],
           ),
           SizedBox(height:30),

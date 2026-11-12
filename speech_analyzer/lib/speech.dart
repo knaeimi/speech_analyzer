@@ -45,7 +45,6 @@ class _SpeechState extends State<Speech> {
   // TODO: change such that we no longer use the delay. 
   // Have something on UI that shows when speechToText starts listening
   void _startListening() async {
-    await Future.delayed(const Duration(milliseconds: 50));
     await _speechToText.listen(
       onResult: _onSpeechResult, 
       listenOptions: 

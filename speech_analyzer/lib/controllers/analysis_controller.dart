@@ -46,13 +46,41 @@ class AnalysisController extends ChangeNotifier {
     }
 
     final displayed = [..._state.displayedWords];
+    print(displayed);
     for(final wordFrequency in _state.displayedWords){ 
       if (_state.selectedWords.contains(wordFrequency.word)){
+        print(wordFrequency);
         displayed.remove(wordFrequency);
+        print(displayed);
       }
         
     }
     _state = _state.copyWith(displayedWords: displayed);
+    notifyListeners();
+  }
+
+  void removeReplace(){
+    if (_state.displayedWords.isEmpty){
+      return;
+    }
+    if (_state.wordCounts.isEmpty){
+      return;
+    }
+
+    final displayed = [..._state.wordCounts.entries.toList()
+      ..sort((e2,e1)=>e1.value.compareTo(e2.value))];
+    print(_state.selectedWords);
+    print(displayed);
+    for(final entry in displayed){ 
+      if (_state.selectedWords.contains(entry.key)){
+        displayed.remove(entry);
+      }
+    }
+
+    final wow = displayed.take(10)
+        .map((entry) => WordFrequency(word: entry.key, count: entry.value))
+        .toList();
+    _state = _state.copyWith(displayedWords: wow);
     notifyListeners();
   }
 

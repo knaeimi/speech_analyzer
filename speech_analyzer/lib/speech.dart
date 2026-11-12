@@ -45,8 +45,7 @@ class _SpeechState extends State<Speech> {
   // TODO: change such that we no longer use the delay. 
   // Have something on UI that shows when speechToText starts listening
   void _startListening() async {
-    await Future.delayed(const Duration(milliseconds: 50));
-    _speechToText.listen(
+    await _speechToText.listen(
       onResult: _onSpeechResult, 
       listenOptions: 
       SpeechListenOptions(
@@ -64,7 +63,7 @@ class _SpeechState extends State<Speech> {
     setState(() {
       _speechEnabled = false;
     });
-    _speechToText.stop();
+    await _speechToText.stop();
   }
 
   void _onSpeechResult(SpeechRecognitionResult result) {
@@ -86,6 +85,14 @@ class _SpeechState extends State<Speech> {
     }
     _startListening();
   }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _speechToText.cancel();
+  }
+  
 
   // Change, edit, refactor if necessary
   // Speech Input page UI
@@ -175,32 +182,6 @@ class _SpeechState extends State<Speech> {
                 child: Text("Submit"),
               ),
               SizedBox(width:20),
-              ElevatedButton(
-                onPressed: () async {
-                  if (await Permission.microphone.request().isGranted) {
-                    //recorder.start(recordConfig, path: audioFilePath);
-                    _startListening();
-                  }
-                }, 
-                child: Icon(
-                  Icons.mic,
-                  semanticLabel: "Mic button: press and begin speech",
-                )
-              ),
-              SizedBox(width: 20),
-              // TODO: speechToText does not stop listening when you click stop
-              ElevatedButton(
-                onPressed: () async {
-                  await _stopListening();
-                  if (!context.mounted) return;
-                  print('stop');
-                  _statusListener("done");
-                  print(_lastWords);
-
-                  context.read<AnalysisController>().analyze(_lastWords);
-                }, 
-                child: Text("Stop")
-              ),
             ],
           ),
           SizedBox(height:30),
@@ -236,7 +217,14 @@ class _SpeechState extends State<Speech> {
           )
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed:
+        _speechToText.isNotListening ? _startListening : _stopListening,
+        tooltip: 'Listen',
+        child: Icon(_speechToText.isNotListening ? Icons.mic_off : Icons.mic),
+      ),
       )
     );
+    
   }
 }

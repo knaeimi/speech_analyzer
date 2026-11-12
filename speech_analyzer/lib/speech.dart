@@ -46,7 +46,7 @@ class _SpeechState extends State<Speech> {
   // Have something on UI that shows when speechToText starts listening
   void _startListening() async {
     await Future.delayed(const Duration(milliseconds: 50));
-    _speechToText.listen(
+    await _speechToText.listen(
       onResult: _onSpeechResult, 
       listenOptions: 
       SpeechListenOptions(
@@ -64,7 +64,7 @@ class _SpeechState extends State<Speech> {
     setState(() {
       _speechEnabled = false;
     });
-    _speechToText.stop();
+    await _speechToText.stop();
   }
 
   void _onSpeechResult(SpeechRecognitionResult result) {
@@ -86,6 +86,14 @@ class _SpeechState extends State<Speech> {
     }
     _startListening();
   }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _speechToText.cancel();
+  }
+  
 
   // Change, edit, refactor if necessary
   // Speech Input page UI
@@ -236,7 +244,14 @@ class _SpeechState extends State<Speech> {
           )
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed:
+        _speechToText.isNotListening ? _startListening : _stopListening,
+        tooltip: 'Listen',
+        child: Icon(_speechToText.isNotListening ? Icons.mic_off : Icons.mic),
+      ),
       )
     );
+    
   }
 }

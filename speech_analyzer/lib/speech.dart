@@ -185,21 +185,6 @@ class _SpeechState extends State<Speech> {
             ],
           ),
           SizedBox(height:30),
-          SizedBox(
-            height:200,
-            width:500,
-            child: TextField(
-              style: TextStyle(color: Colors.white),
-              maxLines: 10,
-              // controller: myController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: _currentWords,
-                hintStyle: TextStyle(color: Colors.white)
-              ),
-            ),
-          ),
-          SizedBox(height:30),
           Container(
             width: 500,
             height: 200,

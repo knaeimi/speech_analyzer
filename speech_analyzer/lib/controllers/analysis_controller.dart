@@ -69,12 +69,17 @@ class AnalysisController extends ChangeNotifier {
 
     final displayed = [..._state.wordCounts.entries.toList()
       ..sort((e2,e1)=>e1.value.compareTo(e2.value))];
-    print(_state.selectedWords);
-    print(displayed);
+    //print(_state.selectedWords);
+    //print(displayed);
+    var selected = [];
     for(final entry in displayed){ 
       if (_state.selectedWords.contains(entry.key)){
-        displayed.remove(entry);
+        //displayed.remove(entry);
+        selected.add(entry);
       }
+    }
+    for (final entry in selected){
+      displayed.remove(entry);
     }
 
     final wow = displayed.take(10)

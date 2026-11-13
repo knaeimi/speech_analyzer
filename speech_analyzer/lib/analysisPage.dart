@@ -78,7 +78,7 @@ class AnalysisPage extends StatelessWidget{
             children: [
               ElevatedButton(
                 onPressed: () =>
-                  context.read<AnalysisController>().removeSelected(),
+                  context.read<AnalysisController>().removeReplace(),
                 child: Text("Remove Selected"),
               ),SizedBox(width: 20),
               ElevatedButton(

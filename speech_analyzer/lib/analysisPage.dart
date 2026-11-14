@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'controllers/analysis_controller.dart';
+import 'seeSpeechPage.dart';
 
 /**
  * Analysis page class
@@ -17,7 +18,7 @@ class AnalysisPage extends StatelessWidget{
         child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizedBox(height: 40),
+          SizedBox(height: 20),
           Text(
             "Analysis",
             style: TextStyle(
@@ -25,7 +26,51 @@ class AnalysisPage extends StatelessWidget{
               color: Colors.white
             )
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 10),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                ),
+                label: Text(
+                  'Analysis',
+                  style: TextStyle(
+                    decoration: TextDecoration.underline,
+                    color: Colors.white,
+                    decorationColor: Colors.white,
+                    fontSize: 18 
+                  )
+                ),
+              ),
+              SizedBox(width: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SeeSpeechPage()) 
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                ),
+                child: Text(
+                  'See Speech',
+                  style: TextStyle(
+                    color: Colors.white,
+                    decorationColor: Colors.white,
+                    fontSize: 18 
+                  )
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10),
           // Source - https://stackoverflow.com/a/67434006
           // Posted by LihnNguyen
           // Retrieved 2026-10-09, License - CC BY-SA 4.0
@@ -103,7 +148,6 @@ class AnalysisPage extends StatelessWidget{
               ),
             ],
           ),
-          SizedBox(height:20),
         ],
       ),
       )

@@ -68,7 +68,7 @@ class _TextInputPageState extends State<TextInputPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => Speech()) 
-                    );
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent,

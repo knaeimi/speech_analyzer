@@ -101,113 +101,114 @@ class _SpeechState extends State<Speech> {
     return Center(
       child: Scaffold(
         body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          SizedBox(height: 40),
-          Text(
-            "Speech Analyzer",
-            style: TextStyle(
-              fontSize: 30,
-              color: Colors.white
-            )
-          ),
-          SizedBox(height: 30),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ElevatedButton.icon(
-                onPressed: () {
-                  // textMap.clear();
-                  Navigator.pop(
-                    context,
-                    MaterialPageRoute(builder: (context) => AnalysisPage())
-                    );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                ),
-                label: Text(
-                  'Text',
-                  style: TextStyle(
-                    color: Colors.white,
-                    decorationColor: Colors.white,
-                    fontSize: 18 
-                  )
-                ),
-              ),
-              SizedBox(width: 20),
-              ElevatedButton(
-                onPressed: () {
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                ),
-                child: Text(
-                  'Speech',
-                  style: TextStyle(
-                    decoration: TextDecoration.underline,
-                    color: Colors.white,
-                    decorationColor: Colors.white,
-                    fontSize: 18 
-                  )
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 30),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  // myController.clear();
-                }, 
-                child: Text("Clear")
-                
-              ),
-              SizedBox(width: 20),
-              ElevatedButton(
-                onPressed: () {
-                  _currentWords = _currentWords.toLowerCase();
-                  context.read<AnalysisController>().analyze(_currentWords);
-                  print(_pluginConfidenceScore);
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AnalysisPage())
-                    ); 
-                },
-                child: Text("Submit"),
-              ),
-              SizedBox(width:20),
-            ],
-          ),
-          SizedBox(height:30),
-          Container(
-            width: 500,
-            height: 200,
-            padding: EdgeInsetsGeometry.fromLTRB(10,10,10,10),
-            decoration: BoxDecoration(border: Border.all(color: Colors.white)),
-            child: SingleChildScrollView(
-              child: Text(
-                _currentWords,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.white),
-                softWrap: true,
-                maxLines: 20,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            SizedBox(height: 40),
+            Text(
+              "Speech Analyzer",
+              style: TextStyle(
+                fontSize: 30,
+                color: Colors.white
               )
             ),
-          )
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed:
-        _speechToText.isNotListening ? _startListening : _stopListening,
-        tooltip: 'Listen',
-        child: Icon(_speechToText.isNotListening ? Icons.mic_off : Icons.mic),
-      ),
+            SizedBox(height: 30),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {
+                    // textMap.clear();
+                    Navigator.pop(
+                      context,
+                      MaterialPageRoute(builder: (context) => AnalysisPage())
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                  ),
+                  label: Text(
+                    'Text',
+                    style: TextStyle(
+                      color: Colors.white,
+                      decorationColor: Colors.white,
+                      fontSize: 18 
+                    )
+                  ),
+                ),
+                SizedBox(width: 20),
+                ElevatedButton(
+                  onPressed: () {
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                  ),
+                  child: Text(
+                    'Speech',
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      color: Colors.white,
+                      decorationColor: Colors.white,
+                      fontSize: 18 
+                    )
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 30),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    // myController.clear();
+                  }, 
+                  child: Text("Clear")
+                  
+                ),
+                SizedBox(width: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    _currentWords = _currentWords.toLowerCase();
+                    context.read<AnalysisController>().analyze(_currentWords);
+                    print(_pluginConfidenceScore);
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => AnalysisPage())
+                      ); 
+                  },
+                  child: Text("Submit"),
+                ),
+                SizedBox(width:20),
+              ],
+            ),
+            SizedBox(height:30),
+            FloatingActionButton(
+              onPressed:
+              _speechToText.isNotListening ? _startListening : _stopListening,
+              tooltip: 'Listen',
+              child: Icon(_speechToText.isNotListening ? Icons.mic_off : Icons.mic),
+            ),
+            SizedBox(height: 30),
+            Container(
+              width: 500,
+              height: 200,
+              padding: EdgeInsetsGeometry.fromLTRB(10,10,10,10),
+              decoration: BoxDecoration(border: Border.all(color: Colors.white)),
+              child: SingleChildScrollView(
+                child: Text(
+                  _currentWords,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: Colors.white),
+                  softWrap: true,
+                  maxLines: 20,
+                )
+              ),
+            )
+          ],
+        ), 
       )
     );
     

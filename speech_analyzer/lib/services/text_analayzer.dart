@@ -54,4 +54,15 @@ class TextAnalayzer {
     }
     return lengths.reduce((a,b) => a + b) / lengths.length;  
   }
+
+  double totalWordCount(String text){
+    final words = text
+      .replaceAll(RegExp(r"[,.;@#?!&$'-/()]"), '')
+      .replaceAll("\n", " ")
+      .replaceAll("\t"," ")
+      .replaceAll("  ", " ")
+      .split(' ');
+    
+    return (words.length -1);
+  }
 }

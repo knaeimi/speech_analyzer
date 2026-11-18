@@ -92,4 +92,8 @@ class AnalysisController extends ChangeNotifier {
   double averageSentenceLength(){
     return _analayzer.averageSentenceLength(_state.sourceText);
   }
+
+  double totalWordCount(){
+    return _analayzer.totalWordCount(_state.sourceText);
+  }
 }

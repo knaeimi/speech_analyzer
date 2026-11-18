@@ -134,12 +134,16 @@ class AnalysisPage extends StatelessWidget{
                   final message = average == 0
                     ? 'You need to include a period to return a sentence length.'
                     : 'Your average sentence length is ${average.toStringAsFixed(2)} words per sentence.';
+                  final wordCount = context
+                    .read<AnalysisController>()
+                    .totalWordCount();
+                  final wordMessage = 'Your total word count is ${wordCount.toStringAsFixed(0)} words.';
                   showDialog<void>(
                     context: context,
-                    builder: (context) => AlertDialog(content: Text(message)),
+                    builder: (context) => AlertDialog(content: Text('$message\n$wordMessage')),
                   );
                 },
-                child: Text("Average Sentence Length"),
+                child: Text("Length Analysis"),
               ),
               SizedBox(width: 20),
               ElevatedButton(

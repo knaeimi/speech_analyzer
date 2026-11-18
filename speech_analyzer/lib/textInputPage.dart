@@ -44,6 +44,27 @@ class _TextInputPageState extends State<TextInputPage> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(
+                    context,
+                    MaterialPageRoute(builder: (context) => Speech()) 
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                ),
+                child: Text(
+                  'Speech',
+                  style: TextStyle(
+                    color: Colors.white,
+                    decorationColor: Colors.white,
+                    fontSize: 18 
+                  )
+                ),
+              ),
+              SizedBox(width: 20),
               ElevatedButton.icon(
                 onPressed: () {
                   context.read<AnalysisController>().clearWordCounts();
@@ -56,27 +77,6 @@ class _TextInputPageState extends State<TextInputPage> {
                   'Text',
                   style: TextStyle(
                     decoration: TextDecoration.underline,
-                    color: Colors.white,
-                    decorationColor: Colors.white,
-                    fontSize: 18 
-                  )
-                ),
-              ),
-              SizedBox(width: 20),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Speech()) 
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                ),
-                child: Text(
-                  'Speech',
-                  style: TextStyle(
                     color: Colors.white,
                     decorationColor: Colors.white,
                     fontSize: 18 

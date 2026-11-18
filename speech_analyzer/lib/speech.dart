@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:speech_analyzer/textInputPage.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_to_text.dart';
@@ -51,7 +52,9 @@ class _SpeechState extends State<Speech> {
       SpeechListenOptions(
         listenMode: ListenMode.dictation,
         cancelOnError: false,
-        partialResults: true),
+        partialResults: true,
+        listenFor: Duration(minutes: 10), // make sure this works as I want it to (will the web automatically time it out)
+        ),
     );
     setState(() {
       _speechEnabled = true;
@@ -115,28 +118,6 @@ class _SpeechState extends State<Speech> {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                ElevatedButton.icon(
-                  onPressed: () {
-                    // textMap.clear();
-                    Navigator.pop(
-                      context,
-                      MaterialPageRoute(builder: (context) => AnalysisPage())
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                  ),
-                  label: Text(
-                    'Text',
-                    style: TextStyle(
-                      color: Colors.white,
-                      decorationColor: Colors.white,
-                      fontSize: 18 
-                    )
-                  ),
-                ),
-                SizedBox(width: 20),
                 ElevatedButton(
                   onPressed: () {
                   },
@@ -148,6 +129,28 @@ class _SpeechState extends State<Speech> {
                     'Speech',
                     style: TextStyle(
                       decoration: TextDecoration.underline,
+                      color: Colors.white,
+                      decorationColor: Colors.white,
+                      fontSize: 18 
+                    )
+                  ),
+                ),
+                SizedBox(width: 20),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    // textMap.clear();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => TextInputPage())
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                  ),
+                  label: Text(
+                    'Text',
+                    style: TextStyle(
                       color: Colors.white,
                       decorationColor: Colors.white,
                       fontSize: 18 
@@ -173,6 +176,7 @@ class _SpeechState extends State<Speech> {
                     _currentWords = _currentWords.toLowerCase();
                     context.read<AnalysisController>().analyze(_currentWords);
                     print(_pluginConfidenceScore);
+                    _speechToText.stop();
 
                     Navigator.push(
                       context,

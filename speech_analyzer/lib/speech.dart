@@ -26,7 +26,9 @@ class _SpeechState extends State<Speech> {
   bool _speechEnabled = false;
   String _lastWords = '';
   String _currentWords = '';
+  String _transcribedWords = '';
   double _pluginConfidenceScore = 1.0;
+  int _clearOffset = 0;
 
   @override
   void initState() {
@@ -70,8 +72,12 @@ class _SpeechState extends State<Speech> {
   }
 
   void _onSpeechResult(SpeechRecognitionResult result) {
-    setState(() {
-      _currentWords = result.recognizedWords;
+    _transcribedWords = result.recognizedWords;
+
+    setState(() { //every time user presses clear we index further into the string and chop off the old words.
+
+      _currentWords = _transcribedWords.substring(_clearOffset).trim();  // if user hasn't pressed clear the offset is 0 so we get the full string
+    
       if (result.hasConfidenceRating && result.confidence > 0) {
         _pluginConfidenceScore = result.confidence;
       }
@@ -165,7 +171,10 @@ class _SpeechState extends State<Speech> {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    // myController.clear();
+                    setState((){ // if we don't use setState here it doesn't clear until you start speaking again
+                    _currentWords = ''; //textbox is empty now until you start speaking again
+                    _clearOffset = _transcribedWords.toString().length; //listener remembers every word, so just record current string length as an 'offset' and then go that many characters in for substring
+                    });
                   }, 
                   child: Text("Clear")
                   

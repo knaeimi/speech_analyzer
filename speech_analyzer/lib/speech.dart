@@ -24,7 +24,6 @@ class _SpeechState extends State<Speech> {
   var stat;
   SpeechToText _speechToText = SpeechToText();
   bool _speechEnabled = false;
-  String _lastWords = '';
   String _currentWords = '';
   String _transcribedWords = '';
   double _pluginConfidenceScore = 1.0;
@@ -55,6 +54,8 @@ class _SpeechState extends State<Speech> {
         listenMode: ListenMode.dictation,
         cancelOnError: false,
         partialResults: true,
+        autoPunctuation: true,
+        contextualPhrases: List.of(["um","umm","ummm","ummmm","ummmmmm","uh", "like", "huh"]),
         listenFor: Duration(minutes: 10), // make sure this works as I want it to (will the web automatically time it out)
         ),
     );
@@ -87,7 +88,6 @@ class _SpeechState extends State<Speech> {
   void _statusListener(String status) async {
     if (status == "done" && _speechEnabled) {
       setState(() {
-        _lastWords += " $_currentWords ";
         _currentWords = "";
         _speechEnabled = false;
       });
@@ -190,7 +190,7 @@ class _SpeechState extends State<Speech> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => AnalysisPage())
-                      ); 
+                      );                     
                   },
                   child: Text("Submit"),
                 ),

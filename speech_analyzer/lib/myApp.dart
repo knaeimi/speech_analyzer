@@ -3,8 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:speech_analyzer/speech.dart';
 
 import 'controllers/analysis_controller.dart';
-import 'textInputPage.dart';
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

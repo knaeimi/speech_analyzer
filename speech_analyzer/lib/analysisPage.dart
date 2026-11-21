@@ -125,7 +125,13 @@ class AnalysisPage extends StatelessWidget{
                 onPressed: () =>
                   context.read<AnalysisController>().removeReplace(),
                 child: Text("Remove Selected"),
-              ),SizedBox(width: 20),
+              ),
+              SizedBox(width: 20),
+              ElevatedButton(
+                onPressed: () => context.read<AnalysisController>().removeShortWords(), 
+                child: Text("Remove Short Words")
+              ),
+              SizedBox(width: 20),
               ElevatedButton(
                 onPressed: () {
                   final average = context

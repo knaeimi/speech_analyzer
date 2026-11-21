@@ -89,6 +89,33 @@ class AnalysisController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void removeShortWords(){
+    if (_state.displayedWords.isEmpty){
+      return;
+    }
+    if (_state.wordCounts.isEmpty){
+      return;
+    }
+
+    final displayed = [..._state.wordCounts.entries.toList()
+      ..sort((e2,e1)=>e1.value.compareTo(e2.value))];
+    var selected = [];
+    for(final entry in displayed){ 
+      if (entry.key.length<4){
+        selected.add(entry);
+      }
+    }
+    for (final entry in selected){
+      displayed.remove(entry);
+    }
+
+    final wow = displayed.take(10)
+        .map((entry) => WordFrequency(word: entry.key, count: entry.value))
+        .toList();
+    _state = _state.copyWith(displayedWords: wow);
+    notifyListeners();
+  }
+
   double averageSentenceLength(){
     return _analayzer.averageSentenceLength(_state.sourceText);
   }

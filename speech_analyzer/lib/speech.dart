@@ -127,16 +127,9 @@ class _SpeechState extends State<Speech> {
                 ElevatedButton(
                   onPressed: () {
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                  ),
                   child: Text(
                     'Speech',
                     style: TextStyle(
-                      decoration: TextDecoration.underline,
-                      color: Colors.white,
-                      decorationColor: Colors.white,
                       fontSize: 18 
                     )
                   ),
@@ -150,15 +143,9 @@ class _SpeechState extends State<Speech> {
                       MaterialPageRoute(builder: (context) => TextInputPage())
                     );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                  ),
                   label: Text(
                     'Text',
                     style: TextStyle(
-                      color: Colors.white,
-                      decorationColor: Colors.white,
                       fontSize: 18 
                     )
                   ),

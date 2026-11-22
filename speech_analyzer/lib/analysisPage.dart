@@ -33,16 +33,9 @@ class AnalysisPage extends StatelessWidget{
               ElevatedButton.icon(
                 onPressed: () {
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                ),
                 label: Text(
                   'Analysis',
                   style: TextStyle(
-                    decoration: TextDecoration.underline,
-                    color: Colors.white,
-                    decorationColor: Colors.white,
                     fontSize: 18 
                   )
                 ),
@@ -55,15 +48,9 @@ class AnalysisPage extends StatelessWidget{
                     MaterialPageRoute(builder: (context) => SeeSpeechPage()) 
                   );
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                ),
                 child: Text(
                   'See Speech',
                   style: TextStyle(
-                    color: Colors.white,
-                    decorationColor: Colors.white,
                     fontSize: 18 
                   )
                 ),

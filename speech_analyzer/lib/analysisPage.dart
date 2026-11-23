@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'controllers/analysis_controller.dart';
 import 'seeSpeechPage.dart';
+import 'scrollablePage.dart';
 
 /**
  * Analysis page class
@@ -137,6 +138,16 @@ class AnalysisPage extends StatelessWidget{
                   );
                 },
                 child: Text("Length Analysis"),
+              ),
+              SizedBox(width: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ScrollablePage()) 
+                  );
+                },
+                child: Text('See full list'),
               ),
               SizedBox(width: 20),
               ElevatedButton(

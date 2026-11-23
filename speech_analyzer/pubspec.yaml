@@ -38,6 +38,7 @@ dependencies:
   js: any
   speech_to_text: ^7.5.0
   collection: ^1.19.1
+  scroll_table: ^1.0.1
 
 dev_dependencies:
   flutter_test:

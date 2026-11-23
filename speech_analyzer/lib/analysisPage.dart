@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:record/record.dart';
 import 'controllers/analysis_controller.dart';
 import 'seeSpeechPage.dart';
 
 /**
  * Analysis page class
  */
-class AnalysisPage extends StatelessWidget{
+class AnalysisPage extends StatefulWidget {
   const AnalysisPage({super.key});
+
+  @override
+  State<AnalysisPage> createState() => _AnalysisPageState();
+}
+
+class _AnalysisPageState extends State<AnalysisPage> {
+  bool isCheck = false;
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +73,12 @@ class AnalysisPage extends StatelessWidget{
             dataTextStyle: TextStyle(color: Colors.white),
             columnSpacing: 50,
             columns: const <DataColumn>[
+               DataColumn(
+                label: Text(
+                  'Highlight',
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+              ),
               DataColumn(
                 label: Text(
                   'Select',
@@ -92,7 +106,15 @@ class AnalysisPage extends StatelessWidget{
                   key: ValueKey(entry.word),
                   cells: [
                     DataCell(
-                      Checkbox(
+                     Checkbox(
+                      value: isCheck ,
+                      activeColor: isCheck ?Colors.green: Colors.grey,
+                      onChanged: (bool ? value) {
+                      setState(
+                        () { isCheck = value ?? false;});})
+                    ),
+                    DataCell(
+                    Checkbox(
                         value: state.selectedWords.contains(entry.word),
                         onChanged: (value) => context
                             .read<AnalysisController>()

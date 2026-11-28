@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:record/record.dart';
 import 'controllers/analysis_controller.dart';
 import 'seeSpeechPage.dart';
-import 'scrollablePage.dart';
+import 'scrollPage.dart';
 
 /**
  * Analysis page class
@@ -166,7 +166,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => ScrollablePage()) 
+                    MaterialPageRoute(builder: (context) => ScrollPage()) 
                   );
                 },
                 child: Text('See full list'),
